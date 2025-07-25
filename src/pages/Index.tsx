@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import Sidebar from '@/components/Layout/Sidebar';
-import Header from '@/components/Layout/Header';
+import DashboardLayout from '@/components/Layout/DashBoardLayout'; // ✅ new reusable layout
 
+// Pages
 import Dashboard from '@/components/Dashboard/Dashboard';
 import StudentList from '@/components/Students/StudentList';
 import TeacherList from '@/components/Teachers/TeacherList';
@@ -59,25 +59,9 @@ const Index = () => {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-gray-50">
-      {/* Fixed Header */}
-      <div className="fixed top-0 left-0 right-0 h-16 z-30 bg-white shadow flex items-center px-6">
-        <Header />
-      </div>
-
-      {/* Layout below header */}
-      <div className="flex pt-16 h-[calc(100vh-4rem)]">
-        {/* Sidebar - fixed height, starts below header */}
-        <div className="w-64 bg-white border-r shadow h-full">
-          <Sidebar activeTab={activeTab} setActiveTab={handleTabChange} />
-        </div>
-
-        {/* Main content scrollable */}
-        <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
-          {renderContent()}
-        </main>
-      </div>
-    </div>
+    <DashboardLayout activeTab={activeTab} setActiveTab={handleTabChange}>
+      {renderContent()}
+    </DashboardLayout>
   );
 };
 

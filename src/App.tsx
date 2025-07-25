@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
+import HostelManagement from "./pages/HostelManagement"; // ✅ Added hostel page
 import PrivateRoute from "@/components/PrivateRoute";
 import { AuthProvider } from "@/contexts/AuthContext";
 
@@ -28,6 +29,14 @@ const App = () => (
               element={
                 <PrivateRoute>
                   <Index />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/hostel" // ✅ New route for hostel
+              element={
+                <PrivateRoute>
+                  <HostelManagement />
                 </PrivateRoute>
               }
             />

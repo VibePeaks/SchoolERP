@@ -18,7 +18,8 @@ import {
   Smartphone,
   Library,
   UserCheck,
-  Monitor
+  Monitor,
+  Bed
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -51,6 +52,7 @@ const Sidebar = ({ activeTab, setActiveTab }: SidebarProps) => {
     { id: 'library', label: 'Library', icon: Library, roles: ['admin', 'principal', 'teacher'], isNew: true },
     { id: 'hr-payroll', label: 'HR & Payroll', icon: UserCheck, roles: ['admin', 'principal'], isNew: true },
     { id: 'e-learning', label: 'E-Learning', icon: Monitor, roles: ['admin', 'principal', 'teacher'], isNew: true },
+    { id: 'hostel', label: 'Hostel', icon: Bed, roles: ['admin', 'principal', 'teacher'], isNew: true },
     { id: 'settings', label: 'Settings', icon: Settings, roles: ['admin'] },
   ];
 
@@ -82,10 +84,15 @@ const Sidebar = ({ activeTab, setActiveTab }: SidebarProps) => {
             return (
               <button
                 key={item.id}
-                onClick={() => {
-                  setActiveTab(item.id);
-                  localStorage.setItem('activeTab', item.id);
-                }}
+                  onClick={() => {
+                        if (item.id === 'hostel') {
+                      navigate('/hostel');
+                    }else {
+                      setActiveTab(item.id);
+                      localStorage.setItem('activeTab', item.id);
+                    }
+                  }}
+
                 className={cn(
                   'w-full flex items-center justify-between px-4 py-3 rounded-lg text-left transition-colors',
                   activeTab === item.id
