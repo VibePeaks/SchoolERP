@@ -1,0 +1,21 @@
+// Base interfaces for application layer
+public interface ICommandHandler<TCommand>
+{
+    Task Handle(TCommand command);
+}
+
+public interface IQueryHandler<TQuery, TResult>
+{
+    Task<TResult> Handle(TQuery query);
+}
+
+// Base classes for domain events
+public abstract class DomainEvent
+{
+    public DateTime OccurredOn { get; } = DateTime.UtcNow;
+}
+
+public interface IHandleDomainEvent<TEvent> where TEvent : DomainEvent
+{
+    Task Handle(TEvent @event);
+}
