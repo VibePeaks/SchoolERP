@@ -1,287 +1,313 @@
-
 import React, { useState } from 'react';
-import { DollarSign, CreditCard, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { DollarSign, Calendar, Check, AlertCircle, Filter, Plus, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { ReceiptGenerator } from './ReceiptGenerator';
 
-interface FeeRecord {
+interface Fee {
   id: string;
-  studentName: string;
   studentId: string;
-  class: string;
+  studentName: string;
   feeType: string;
   amount: number;
   dueDate: string;
-  paidDate?: string;
   status: 'paid' | 'pending' | 'overdue';
-  paymentMethod?: string;
+  paymentDate?: string;
+  receiptNumber?: string;
 }
 
 const FeeManagement = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [feeRecords] = useState<FeeRecord[]>([
+  const [fees, setFees] = useState<Fee[]>([
     {
       id: '1',
-      studentName: 'Alice Johnson',
       studentId: 'STU001',
-      class: 'Grade 10 - A',
-      feeType: 'Tuition Fee',
-      amount: 5000,
-      dueDate: '2024-01-15',
-      paidDate: '2024-01-10',
+      studentName: 'Alice Johnson',
+      feeType: 'Tuition',
+      amount: 500,
+      dueDate: '2023-11-15',
       status: 'paid',
-      paymentMethod: 'Bank Transfer'
+      paymentDate: '2023-11-10',
+      receiptNumber: 'RC-2023-001'
     },
     {
       id: '2',
-      studentName: 'Bob Smith',
       studentId: 'STU002',
-      class: 'Grade 10 - A',
-      feeType: 'Tuition Fee',
-      amount: 5000,
-      dueDate: '2024-01-15',
+      studentName: 'Bob Smith',
+      feeType: 'Tuition',
+      amount: 500,
+      dueDate: '2023-11-15',
       status: 'pending'
     },
     {
       id: '3',
-      studentName: 'Charlie Brown',
       studentId: 'STU003',
-      class: 'Grade 9 - A',
-      feeType: 'Tuition Fee',
-      amount: 4500,
-      dueDate: '2023-12-15',
+      studentName: 'Charlie Brown',
+      feeType: 'Library',
+      amount: 50,
+      dueDate: '2023-11-01',
       status: 'overdue'
-    },
-    {
-      id: '4',
-      studentName: 'Diana Prince',
-      studentId: 'STU004',
-      class: 'Grade 10 - B',
-      feeType: 'Lab Fee',
-      amount: 1000,
-      dueDate: '2024-01-20',
-      paidDate: '2024-01-18',
-      status: 'paid',
-      paymentMethod: 'Cash'
     }
   ]);
 
-  const filteredRecords = feeRecords.filter(record =>
-    record.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.studentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.class.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [filterStatus, setFilterStatus] = useState<'all' | 'paid' | 'pending' | 'overdue'>('all');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newFee, setNewFee] = useState<Partial<Fee>>({
+    feeType: 'Tuition',
+    amount: 0,
+    dueDate: new Date().toISOString().split('T')[0]
+  });
+  const [selectedReceipt, setSelectedReceipt] = useState<Fee | null>(null);
 
-  const getStats = () => {
-    const totalAmount = feeRecords.reduce((sum, record) => sum + record.amount, 0);
-    const paidAmount = feeRecords
-      .filter(record => record.status === 'paid')
-      .reduce((sum, record) => sum + record.amount, 0);
-    const pendingAmount = feeRecords
-      .filter(record => record.status === 'pending')
-      .reduce((sum, record) => sum + record.amount, 0);
-    const overdueAmount = feeRecords
-      .filter(record => record.status === 'overdue')
-      .reduce((sum, record) => sum + record.amount, 0);
+  const feeTypes = ['Tuition', 'Library', 'Transport', 'Uniform', 'Exam'];
 
-    return {
-      total: totalAmount,
-      paid: paidAmount,
-      pending: pendingAmount,
-      overdue: overdueAmount,
-      collectionRate: totalAmount > 0 ? ((paidAmount / totalAmount) * 100).toFixed(1) : 0
-    };
-  };
-
-  const stats = getStats();
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'paid': return 'bg-green-100 text-green-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'overdue': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+  const handleAddFee = () => {
+    if (newFee.studentId && newFee.amount && newFee.dueDate) {
+      const feeToAdd: Fee = {
+        id: Date.now().toString(),
+        studentId: newFee.studentId,
+        studentName: newFee.studentName || 'Unknown Student',
+        feeType: newFee.feeType || 'Tuition',
+        amount: newFee.amount,
+        dueDate: newFee.dueDate,
+        status: 'pending'
+      };
+      setFees([...fees, feeToAdd]);
+      setNewFee({});
+      setIsAddDialogOpen(false);
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'paid': return <CheckCircle size={16} className="text-green-500" />;
-      case 'pending': return <Clock size={16} className="text-yellow-500" />;
-      case 'overdue': return <AlertCircle size={16} className="text-red-500" />;
-      default: return null;
+  const handleMarkAsPaid = (id: string) => {
+    setFees(fees.map(fee => 
+      fee.id === id ? { 
+        ...fee, 
+        status: 'paid',
+        paymentDate: new Date().toISOString().split('T')[0],
+        receiptNumber: `RC-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`
+      } : fee
+    ));
+  };
+
+  const filteredFees = fees.filter(fee => 
+    filterStatus === 'all' || fee.status === filterStatus
+  );
+
+  const totalPending = fees.filter(f => f.status === 'pending').reduce((sum, fee) => sum + fee.amount, 0);
+  const totalOverdue = fees.filter(f => f.status === 'overdue').reduce((sum, fee) => sum + fee.amount, 0);
+  const totalPaid = fees.filter(f => f.status === 'paid').reduce((sum, fee) => sum + fee.amount, 0);
+
+  const handleViewReceipt = (fee: Fee) => {
+    if (fee.status === 'paid' && fee.paymentDate && fee.receiptNumber) {
+      setSelectedReceipt(fee);
     }
   };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Fee Management</h1>
-        <p className="text-gray-600 mt-2">Track and manage student fee payments</p>
+      {/* Header and Add Fee Dialog */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Fee Management</h1>
+          <p className="text-gray-600 mt-2">Track and manage student payments</p>
+        </div>
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="flex items-center space-x-2">
+              <Plus size={20} />
+              <span>Add Fee</span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Fee</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Student ID</Label>
+                <Input 
+                  value={newFee.studentId || ''}
+                  onChange={(e) => setNewFee({...newFee, studentId: e.target.value})}
+                  placeholder="STU001"
+                />
+              </div>
+              <div>
+                <Label>Fee Type</Label>
+                <Select 
+                  value={newFee.feeType || 'Tuition'}
+                  onValueChange={(value) => setNewFee({...newFee, feeType: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select fee type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {feeTypes.map(type => (
+                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Amount</Label>
+                <Input 
+                  type="number"
+                  value={newFee.amount || ''}
+                  onChange={(e) => setNewFee({...newFee, amount: Number(e.target.value)})}
+                  placeholder="500"
+                />
+              </div>
+              <div>
+                <Label>Due Date</Label>
+                <Input 
+                  type="date"
+                  value={newFee.dueDate || ''}
+                  onChange={(e) => setNewFee({...newFee, dueDate: e.target.value})}
+                />
+              </div>
+              <Button onClick={handleAddFee}>Add Fee</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <DollarSign className="text-blue-500" size={20} />
-              <div>
-                <p className="text-sm text-gray-600">Total Fees</p>
-                <p className="text-2xl font-bold text-blue-600">₹{stats.total.toLocaleString()}</p>
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pending Fees</CardTitle>
+            <AlertCircle className="h-4 w-4 text-yellow-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${totalPending}</div>
+            <p className="text-xs text-muted-foreground">Unpaid student fees</p>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="text-green-500" size={20} />
-              <div>
-                <p className="text-sm text-gray-600">Collected</p>
-                <p className="text-2xl font-bold text-green-600">₹{stats.paid.toLocaleString()}</p>
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Overdue Fees</CardTitle>
+            <AlertCircle className="h-4 w-4 text-red-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${totalOverdue}</div>
+            <p className="text-xs text-muted-foreground">Past due date fees</p>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <Clock className="text-yellow-500" size={20} />
-              <div>
-                <p className="text-sm text-gray-600">Pending</p>
-                <p className="text-2xl font-bold text-yellow-600">₹{stats.pending.toLocaleString()}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <AlertCircle className="text-red-500" size={20} />
-              <div>
-                <p className="text-sm text-gray-600">Overdue</p>
-                <p className="text-2xl font-bold text-red-600">₹{stats.overdue.toLocaleString()}</p>
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Paid Fees</CardTitle>
+            <Check className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${totalPaid}</div>
+            <p className="text-xs text-muted-foreground">Completed payments</p>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Fee Overview</TabsTrigger>
-          <TabsTrigger value="pending">Pending Payments</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-        </TabsList>
+      {/* Filter and Export */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <Select 
+            value={filterStatus} 
+            onValueChange={(value: 'all' | 'paid' | 'pending' | 'overdue') => setFilterStatus(value)}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="paid">Paid</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="overdue">Overdue</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Button variant="outline" className="gap-2">
+          <Download size={16} />
+          Export
+        </Button>
+      </div>
 
-        <TabsContent value="overview" className="space-y-4">
-          <div className="flex items-center space-x-4">
-            <Input
-              placeholder="Search by student name, ID, or class..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-md"
-            />
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>All Fee Records</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {filteredRecords.map(record => (
-                  <div key={record.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <DollarSign size={20} className="text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{record.studentName}</p>
-                        <p className="text-sm text-gray-500">{record.studentId} • {record.class}</p>
-                        <p className="text-sm text-gray-500">{record.feeType}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-lg">₹{record.amount.toLocaleString()}</p>
-                      <div className="flex items-center space-x-2 mt-1">
-                        {getStatusIcon(record.status)}
-                        <Badge className={getStatusColor(record.status)}>
-                          {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Due: {new Date(record.dueDate).toLocaleDateString()}
-                      </p>
-                      {record.paidDate && (
-                        <p className="text-xs text-green-600">
-                          Paid: {new Date(record.paidDate).toLocaleDateString()}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="pending">
-          <Card>
-            <CardHeader>
-              <CardTitle>Pending & Overdue Payments</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {feeRecords.filter(r => r.status !== 'paid').map(record => (
-                  <div key={record.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                        <AlertCircle size={20} className="text-red-600" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{record.studentName}</p>
-                        <p className="text-sm text-gray-500">{record.class} • {record.feeType}</p>
-                        <p className="text-sm text-red-600">Due: {new Date(record.dueDate).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <div className="text-right">
-                        <p className="font-semibold text-lg">₹{record.amount.toLocaleString()}</p>
-                        <Badge className={getStatusColor(record.status)}>
-                          {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
-                        </Badge>
-                      </div>
-                      <Button size="sm">
-                        <CreditCard size={16} className="mr-2" />
-                        Collect Payment
+      {/* Fees Table */}
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Student</TableHead>
+                <TableHead>Fee Type</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Due Date</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredFees.map((fee) => (
+                <TableRow key={fee.id}>
+                  <TableCell className="font-medium">{fee.studentName}</TableCell>
+                  <TableCell>{fee.feeType}</TableCell>
+                  <TableCell>${fee.amount}</TableCell>
+                  <TableCell>{new Date(fee.dueDate).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <Badge variant={
+                      fee.status === 'paid' ? 'default' : 
+                      fee.status === 'pending' ? 'secondary' : 'destructive'
+                    }>
+                      {fee.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {fee.status !== 'paid' ? (
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleMarkAsPaid(fee.id)}
+                      >
+                        Mark Paid
                       </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                    ) : (
+                      <div className="flex space-x-2">
+                        <Button 
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleViewReceipt(fee)}
+                        >
+                          View Receipt
+                        </Button>
+                        <span className="text-sm text-green-600">
+                          Paid on {fee.paymentDate && new Date(fee.paymentDate).toLocaleDateString()}
+                        </span>
+                      </div>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
-        <TabsContent value="reports">
-          <Card>
-            <CardHeader>
-              <CardTitle>Fee Collection Reports</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <DollarSign size={48} className="mx-auto text-gray-400 mb-4" />
-                <p className="text-gray-600">Detailed fee collection reports and analytics will be available here.</p>
-                <p className="text-sm text-gray-500 mt-2">Collection Rate: {stats.collectionRate}%</p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      {/* Receipt Dialog */}
+      <Dialog open={!!selectedReceipt} onOpenChange={(open) => !open && setSelectedReceipt(null)}>
+        <DialogContent className="max-w-2xl">
+          {selectedReceipt && selectedReceipt.paymentDate && selectedReceipt.receiptNumber && (
+            <ReceiptGenerator fee={{
+              studentName: selectedReceipt.studentName,
+              studentId: selectedReceipt.studentId,
+              feeType: selectedReceipt.feeType,
+              amount: selectedReceipt.amount,
+              paymentDate: selectedReceipt.paymentDate,
+              receiptNumber: selectedReceipt.receiptNumber
+            }} />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

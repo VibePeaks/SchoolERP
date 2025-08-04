@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, Search, User, Phone, Mail, MapPin, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useGamification } from '@/contexts/GamificationContext';
 
 interface Student {
   id: string;
@@ -30,6 +30,7 @@ interface Student {
 }
 
 const StudentList = () => {
+  const { addPoints, unlockBadge } = useGamification();
   const [students, setStudents] = useState<Student[]>([
     {
       id: '1',
@@ -131,6 +132,10 @@ const StudentList = () => {
         attendancePercentage: 0
       };
       setStudents([...students, studentToAdd]);
+      addPoints(10); // Award 10 points for adding a student
+      if (students.length >= 5) {
+        unlockBadge('homework-champion');
+      }
       setNewStudent({});
       setIsAddDialogOpen(false);
     }
@@ -138,6 +143,7 @@ const StudentList = () => {
 
   const handleDeleteStudent = (id: string) => {
     setStudents(students.filter(student => student.id !== id));
+    addPoints(5); // Award 5 points for maintaining records
   };
 
   const getStatusColor = (status: string) => {
@@ -162,7 +168,7 @@ const StudentList = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Student Management</h1>
-          <p className="text-gray-600 mt-2">Manage student records and information</p>
+          <p className="text-gray-600 mt-2">Earn points and badges for your actions!</p>
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>

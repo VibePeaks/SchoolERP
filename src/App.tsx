@@ -8,9 +8,10 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
-import HostelManagement from "./pages/HostelManagement"; // ✅ Added hostel page
+import HostelManagement from "./pages/HostelManagement";
 import PrivateRoute from "@/components/PrivateRoute";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { GamificationProvider } from "@/contexts/GamificationContext";
 
 const queryClient = new QueryClient();
 
@@ -20,29 +21,31 @@ const App = () => (
       <Toaster />
       <Sonner />
       <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute>
-                  <Index />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/hostel" // ✅ New route for hostel
-              element={
-                <PrivateRoute>
-                  <HostelManagement />
-                </PrivateRoute>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <GamificationProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <PrivateRoute>
+                    <Index />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/hostel"
+                element={
+                  <PrivateRoute>
+                    <HostelManagement />
+                  </PrivateRoute>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </GamificationProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
