@@ -62,9 +62,6 @@ interface Attendance {
 }
 
 const HRPayrollManagement = () => {
-  const [selectedMonth, setSelectedMonth] = useState('2024-01');
-  const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
-
   const mockEmployees: Employee[] = [
     {
       id: '1',
@@ -239,6 +236,12 @@ const HRPayrollManagement = () => {
     }
   ];
 
+  const [selectedMonth, setSelectedMonth] = useState('2024-01');
+  const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
+  const [isPaySlipDialogOpen, setIsPaySlipDialogOpen] = useState(false);
+  const [selectedPayrollRecord, setSelectedPayrollRecord] = useState<PayrollRecord | null>(null);
+  const [payrollRecords, setPayrollRecords] = useState<PayrollRecord[]>(mockPayrollRecords);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-yellow-100 text-yellow-800';
@@ -267,6 +270,110 @@ const HRPayrollManagement = () => {
   const pendingLeaves = mockLeaveRequests.filter(req => req.status === 'pending').length;
   const totalEmployees = mockEmployees.filter(emp => emp.status === 'active').length;
   const presentToday = mockAttendance.filter(att => att.status === 'present' || att.status === 'late').length;
+
+  const handleViewSlip = (record: PayrollRecord) => {
+    setSelectedPayrollRecord(record);
+    setIsPaySlipDialogOpen(true);
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!selectedPayrollRecord) return;
+
+    try {
+      // For demo purposes, we'll create a simple text-based PDF
+      // In a real application, you'd use jsPDF or similar library
+      const payslipData = {
+        company: 'Lincoln High School',
+        address: '123 Education Street, Academic City, AC 12345',
+        employee: selectedPayrollRecord.employeeName,
+        employeeId: selectedPayrollRecord.employeeId,
+        department: mockEmployees.find(e => e.id === selectedPayrollRecord.employeeId)?.department || 'N/A',
+        position: mockEmployees.find(e => e.id === selectedPayrollRecord.employeeId)?.position || 'N/A',
+        month: selectedPayrollRecord.month,
+        year: selectedPayrollRecord.year,
+        basicSalary: selectedPayrollRecord.basicSalary,
+        allowances: selectedPayrollRecord.allowances,
+        deductions: selectedPayrollRecord.deductions,
+        netSalary: selectedPayrollRecord.netSalary,
+      };
+
+      // Create a formatted text representation
+      const payslipText = `
+SALARY SLIP
+${payslipData.company}
+${payslipData.address}
+
+Pay Period: ${payslipData.month} ${payslipData.year}
+
+EMPLOYEE DETAILS:
+Name: ${payslipData.employee}
+Employee ID: ${payslipData.employeeId}
+Department: ${payslipData.department}
+Position: ${payslipData.position}
+
+SALARY BREAKDOWN:
+Basic Salary: ₹${payslipData.basicSalary.toLocaleString()}
+House Rent Allowance: ₹${(payslipData.allowances * 0.4).toLocaleString()}
+Conveyance Allowance: ₹${(payslipData.allowances * 0.3).toLocaleString()}
+Medical Allowance: ₹${(payslipData.allowances * 0.2).toLocaleString()}
+LTA: ₹${(payslipData.allowances * 0.1).toLocaleString()}
+
+Total Earnings: ₹${(payslipData.basicSalary + payslipData.allowances).toLocaleString()}
+
+DEDUCTIONS:
+Provident Fund: ₹${(payslipData.deductions * 0.4).toLocaleString()}
+Professional Tax: ₹${(payslipData.deductions * 0.2).toLocaleString()}
+Income Tax: ₹${(payslipData.deductions * 0.3).toLocaleString()}
+Insurance: ₹${(payslipData.deductions * 0.1).toLocaleString()}
+
+Total Deductions: ₹${payslipData.deductions.toLocaleString()}
+
+NET SALARY: ₹${payslipData.netSalary.toLocaleString()}
+
+Generated on: ${new Date().toLocaleString()}
+This is a computer-generated salary slip. No signature required.
+      `.trim();
+
+      // Create and download the file
+      const blob = new Blob([payslipText], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `salary-slip-${selectedPayrollRecord.employeeId}-${payslipData.month}-${payslipData.year}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      // Show success message
+      alert('Salary slip downloaded successfully!');
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      alert('Error downloading salary slip. Please try again.');
+    }
+  };
+
+  const handleMarkAsPaid = (recordId: string) => {
+    // Update the payroll record status to 'paid'
+    const updatedRecords = payrollRecords.map(record =>
+      record.id === recordId
+        ? { ...record, status: 'paid' as const }
+        : record
+    );
+    setPayrollRecords(updatedRecords);
+
+    // Show success message
+    alert('Payroll marked as paid successfully!');
+
+    // In a real application, you would make an API call here:
+    // try {
+    //   await api.updatePayrollStatus(recordId, 'paid');
+    //   // Update local state
+    // } catch (error) {
+    //   console.error('Error updating payroll status:', error);
+    //   alert('Failed to mark as paid. Please try again.');
+    // }
+  };
 
   return (
     <div className="space-y-6">
@@ -554,9 +661,9 @@ const HRPayrollManagement = () => {
                       </div>
                     </div>
                     <div className="flex space-x-2 mt-3">
-                      <Button size="sm" variant="outline">View Slip</Button>
+                      <Button size="sm" variant="outline" onClick={() => handleViewSlip(record)}>View Slip</Button>
                       {record.status === 'processed' && (
-                        <Button size="sm">Mark as Paid</Button>
+                        <Button size="sm" onClick={() => handleMarkAsPaid(record.id)}>Mark as Paid</Button>
                       )}
                     </div>
                   </div>
@@ -650,6 +757,125 @@ const HRPayrollManagement = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Pay Slip Dialog */}
+      <Dialog open={isPaySlipDialogOpen} onOpenChange={setIsPaySlipDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl">Salary Slip</DialogTitle>
+          </DialogHeader>
+          {selectedPayrollRecord && (
+            <div className="space-y-6 overflow-y-auto max-h-[calc(90vh-8rem)] pr-2">
+              {/* Company Header */}
+              <div className="text-center border-b pb-4">
+                <h2 className="text-2xl font-bold text-gray-900">Lincoln High School</h2>
+                <p className="text-gray-600">123 Education Street, Academic City, AC 12345</p>
+                <p className="text-gray-600">Pay Period: {selectedPayrollRecord.month} {selectedPayrollRecord.year}</p>
+              </div>
+
+              {/* Employee Details */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Employee Details</h3>
+                  <div className="space-y-1 text-sm">
+                    <p><span className="font-medium">Name:</span> {selectedPayrollRecord.employeeName}</p>
+                    <p><span className="font-medium">Employee ID:</span> {selectedPayrollRecord.employeeId}</p>
+                    <p><span className="font-medium">Department:</span> {mockEmployees.find(e => e.id === selectedPayrollRecord.employeeId)?.department || 'N/A'}</p>
+                    <p><span className="font-medium">Position:</span> {mockEmployees.find(e => e.id === selectedPayrollRecord.employeeId)?.position || 'N/A'}</p>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Pay Details</h3>
+                  <div className="space-y-1 text-sm">
+                    <p><span className="font-medium">Pay Date:</span> {new Date().toLocaleDateString()}</p>
+                    <p><span className="font-medium">Payment Method:</span> Direct Deposit</p>
+                    <p><span className="font-medium">Account No:</span> ****1234</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Salary Breakdown */}
+              <div className="border rounded-lg overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Description</th>
+                      <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900">Amount (₹)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    <tr>
+                      <td className="px-4 py-3 text-sm text-gray-900">Basic Salary</td>
+                      <td className="px-4 py-3 text-sm text-gray-900 text-right">{selectedPayrollRecord.basicSalary.toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-3 text-sm text-gray-900">House Rent Allowance</td>
+                      <td className="px-4 py-3 text-sm text-gray-900 text-right">{(selectedPayrollRecord.allowances * 0.4).toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-3 text-sm text-gray-900">Conveyance Allowance</td>
+                      <td className="px-4 py-3 text-sm text-gray-900 text-right">{(selectedPayrollRecord.allowances * 0.3).toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-3 text-sm text-gray-900">Medical Allowance</td>
+                      <td className="px-4 py-3 text-sm text-gray-900 text-right">{(selectedPayrollRecord.allowances * 0.2).toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-3 text-sm text-gray-900">LTA</td>
+                      <td className="px-4 py-3 text-sm text-gray-900 text-right">{(selectedPayrollRecord.allowances * 0.1).toLocaleString()}</td>
+                    </tr>
+                    <tr className="bg-blue-50">
+                      <td className="px-4 py-3 text-sm font-semibold text-gray-900">Total Earnings</td>
+                      <td className="px-4 py-3 text-sm font-semibold text-gray-900 text-right">{(selectedPayrollRecord.basicSalary + selectedPayrollRecord.allowances).toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-3 text-sm text-gray-900">Provident Fund</td>
+                      <td className="px-4 py-3 text-sm text-red-600 text-right">-{(selectedPayrollRecord.deductions * 0.4).toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-3 text-sm text-gray-900">Professional Tax</td>
+                      <td className="px-4 py-3 text-sm text-red-600 text-right">-{(selectedPayrollRecord.deductions * 0.2).toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-3 text-sm text-gray-900">Income Tax</td>
+                      <td className="px-4 py-3 text-sm text-red-600 text-right">-{(selectedPayrollRecord.deductions * 0.3).toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-3 text-sm text-gray-900">Insurance</td>
+                      <td className="px-4 py-3 text-sm text-red-600 text-right">-{(selectedPayrollRecord.deductions * 0.1).toLocaleString()}</td>
+                    </tr>
+                    <tr className="bg-red-50">
+                      <td className="px-4 py-3 text-sm font-semibold text-gray-900">Total Deductions</td>
+                      <td className="px-4 py-3 text-sm font-semibold text-red-600 text-right">-{selectedPayrollRecord.deductions.toLocaleString()}</td>
+                    </tr>
+                    <tr className="bg-green-50">
+                      <td className="px-4 py-3 text-lg font-bold text-gray-900">Net Salary</td>
+                      <td className="px-4 py-3 text-lg font-bold text-green-600 text-right">{selectedPayrollRecord.netSalary.toLocaleString()}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Footer */}
+              <div className="text-center text-sm text-gray-500 border-t pt-4">
+                <p>This is a computer-generated salary slip. No signature required.</p>
+                <p>Generated on: {new Date().toLocaleString()}</p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setIsPaySlipDialogOpen(false)}>
+                  Close
+                </Button>
+                <Button onClick={handleDownloadPDF}>
+                  <Download size={16} className="mr-2" />
+                  Download PDF
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

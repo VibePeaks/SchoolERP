@@ -9,13 +9,14 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import StudentModeManager from '@/components/StudentModeManager';
 
 const ParentPortalManagement = () => {
   const [selectedStudent, setSelectedStudent] = useState('1');
 
   const mockStudents = [
-    { id: '1', name: 'Arjun Sharma', class: '10-A', rollNumber: '101' },
-    { id: '2', name: 'Priya Sharma', class: '8-B', rollNumber: '201' }
+    { id: 1, name: 'Arjun Sharma', firstName: 'Arjun', lastName: 'Sharma', class: '10-A', section: 'A', rollNumber: '101' },
+    { id: 2, name: 'Priya Sharma', firstName: 'Priya', lastName: 'Sharma', class: '8-B', section: 'B', rollNumber: '201' }
   ];
 
   const mockAnnouncements = [
@@ -133,7 +134,7 @@ const ParentPortalManagement = () => {
           <p className="text-gray-600 mt-2">Stay connected with your child's education</p>
         </div>
         <div className="flex items-center space-x-4">
-          <select 
+          <select
             value={selectedStudent}
             onChange={(e) => setSelectedStudent(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -148,6 +149,78 @@ const ParentPortalManagement = () => {
             <Bell size={20} className="mr-2" />
             Notifications
           </Button>
+        </div>
+      </div>
+
+      {/* Student Mode Controls */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">Student Mode</h2>
+            <p className="text-gray-600">Give your child controlled access to their educational data</p>
+          </div>
+          <div className="text-4xl">🎓</div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {mockStudents.map((student) => {
+            const studentWithMode = {
+              ...student,
+              isStudentModeEnabled: true, // Mock data
+              studentModeLastAccess: new Date().toISOString(),
+              studentModeAccessCount: Math.floor(Math.random() * 20)
+            };
+
+            return (
+              <Card key={student.id} className="border-2 border-blue-200">
+                <CardContent className="pt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{student.name}</h3>
+                      <p className="text-sm text-gray-600">{student.class} • Roll: {student.rollNumber}</p>
+                    </div>
+                    <div className="text-right">
+                      <StudentModeManager
+                        student={studentWithMode}
+                        parentId={1} // Mock parent ID
+                        onStudentModeToggle={() => {
+                          // Handle mode toggle refresh
+                          console.log('Student mode toggled for', student.name);
+                        }}
+                        onEnterStudentMode={(studentId) => {
+                          console.log('Entering student mode for student', studentId);
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {studentWithMode.isStudentModeEnabled && (
+                    <div className="text-xs text-gray-600 bg-white p-2 rounded border">
+                      <div className="flex justify-between">
+                        <span>Last Access: {new Date(studentWithMode.studentModeLastAccess).toLocaleDateString()}</span>
+                        <span>{studentWithMode.studentModeAccessCount} visits</span>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 p-4 bg-blue-100 rounded-lg border border-blue-300">
+          <div className="flex items-start space-x-3">
+            <div className="text-blue-600 text-xl">ℹ️</div>
+            <div>
+              <h3 className="font-medium text-blue-900">About Student Mode</h3>
+              <ul className="text-sm text-blue-800 mt-1 space-y-1">
+                <li>• Students can view their grades, assignments, and schedule</li>
+                <li>• Parents maintain full control and can monitor access</li>
+                <li>• All activities are logged for safety and accountability</li>
+                <li>• Secure passkey system prevents unauthorized access</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
 

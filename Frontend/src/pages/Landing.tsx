@@ -15,11 +15,17 @@ const LandingPage: React.FC = () => {
         <div className="nav-links">
           <a href="#features">Features</a>
           <a href="#testimonials">Testimonials</a>
-          <a href="#contact">Contact</a>
+          <a href="/about">About</a>
+          <a href="/blog">Blog</a>
+          <a href="/careers">Careers</a>
+          <a href="/contact">Contact</a>
         </div>
         <div className="nav-buttons">
-          <button className="login-btn" onClick={() => navigate('/login')}>Login</button>
-          <button className="signup-btn" onClick={() => alert('Signup flow coming soon!')}>Get Started</button>
+          <button className="login-btn" onClick={() => navigate('/login')}>Staff Login</button>
+          <button className="parent-login-btn" onClick={() => navigate('/parent/login')}>
+            Parent Portal
+          </button>
+          <button className="signup-btn" onClick={() => navigate('/signup')}>Get Started</button>
         </div>
       </nav>
       
@@ -218,10 +224,10 @@ const LandingPage: React.FC = () => {
           <div className="footer-links">
             <h3>Company</h3>
             <ul>
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Careers</a></li>
-              <li><a href="#">Blog</a></li>
-              <li><a href="#">Contact</a></li>
+              <li><a href="/about">About Us</a></li>
+              <li><a href="/careers">Careers</a></li>
+              <li><a href="/blog">Blog</a></li>
+              <li><a href="/contact">Contact</a></li>
             </ul>
           </div>
           
@@ -315,23 +321,40 @@ const LandingPage: React.FC = () => {
           transition: all 0.3s;
         }
         
-        .login-btn {
+        .login-btn, .parent-login-btn {
           background: transparent;
           border: 2px solid #cbd5e1;
           color: #475569;
         }
-        
-        .login-btn:hover {
+
+        .login-btn:hover, .parent-login-btn:hover {
           border-color: #4f46e5;
           color: #4f46e5;
         }
-        
+
+        .parent-login-btn {
+          background: linear-gradient(135deg, #ff6b9d, #c44569);
+          border: none;
+          color: white;
+          padding: 10px 20px;
+          border-radius: 8px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+
+        .parent-login-btn:hover {
+          opacity: 0.9;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 10px rgba(255, 107, 157, 0.3);
+        }
+
         .signup-btn {
           background: linear-gradient(135deg, #4f46e5, #7c3aed);
           color: white;
           border: none;
         }
-        
+
         .signup-btn:hover {
           opacity: 0.9;
           transform: translateY(-2px);
@@ -705,15 +728,16 @@ const LandingPage: React.FC = () => {
           gap: 20px;
         }
         
-        .cta .secondary-btn {
-          background: transparent;
-          border: 2px solid rgba(255, 255, 255, 0.5);
-          color: white;
+        .cta .primary-btn, .cta .secondary-btn {
+          background: white;
+          border: 2px solid white;
+          color: #4f46e5;
         }
-        
-        .cta .secondary-btn:hover {
-          background: rgba(255, 255, 255, 0.1);
+
+        .cta .primary-btn:hover, .cta .secondary-btn:hover {
+          background: rgba(255, 255, 255, 0.9);
           border-color: white;
+          color: #7c3aed;
         }
         
         /* Footer */

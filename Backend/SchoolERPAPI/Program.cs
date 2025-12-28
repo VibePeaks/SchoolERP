@@ -1,26 +1,43 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
-using Microsoft.EntityFrameworkCore;
-using SchoolERP.API.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using Microsoft.OpenApi.Models;
+using SchoolERP.API.Data;
 using SchoolERP.API.Middleware;
 using SchoolERP.API.Services;
-using Microsoft.Extensions.Hosting;
+using SchoolERPAPI.Middleware;
+using SchoolERPAPI.Services;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlServerOptions => {
+            sqlServerOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+        }));
 
 // Add background services
 builder.Services.AddHostedService<ScheduledTasksService>();
-builder.Services.AddHostedService(provider => 
+builder.Services.AddHostedService(provider =>
     new BackupService(provider, builder.Configuration["Backup:Path"]));
+
+// Add subscription services
+builder.Services.AddScoped<StripePaymentService>();
+
+// Add database service for error handling and transactions
+builder.Services.AddScoped<IDatabaseService, DatabaseService>();
+
+// Add SignalR for real-time features
+builder.Services.AddSignalR();
+
+// Add AI Analytics Service
+builder.Services.AddScoped<AIAnalyticsService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -88,10 +105,35 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Global exception handling middleware (must be first)
+app.UseGlobalExceptionHandler();
+
+app.UseMiddleware<TenantMiddleware>(); // Multi-tenant middleware
 app.UseMiddleware<AuditLogMiddleware>();
 app.MapControllers();
+app.MapHub<SubscriptionHub>("/hubs/subscription"); // SignalR hub for real-time features
 
 // Add health check endpoint
 app.MapGet("/health", () => Results.Ok(new { Status = "Healthy" }));
+
+// Add database connection test endpoint
+app.MapGet("/api/test-db", async (AppDbContext db) =>
+{
+    try
+    {
+        var tenants = await db.Tenants.CountAsync();
+        return Results.Ok(new {
+            status = "Connected",
+            tenantCount = tenants,
+            server = "Azure SQL Database",
+            tier = "Free"
+        });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+});
 
 app.Run();

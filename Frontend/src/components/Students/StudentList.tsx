@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Search, User, Phone, Mail, MapPin, Calendar } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Edit, Trash2, Search, User, Phone, Mail, MapPin, Calendar, Upload, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,25 +9,10 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGamification } from '@/contexts/GamificationContext';
-
-interface Student {
-  id: string;
-  name: string;
-  rollNumber: string;
-  class: string;
-  section: string;
-  dateOfBirth: string;
-  gender: string;
-  address: string;
-  phone: string;
-  email: string;
-  parentName: string;
-  parentPhone: string;
-  admissionDate: string;
-  status: 'active' | 'inactive';
-  feeStatus: 'paid' | 'pending' | 'overdue';
-  attendancePercentage: number;
-}
+import { useApi, useMutation } from '@/hooks/useApi';
+import { studentService } from '@/services/studentService';
+import { Student } from '@/types/index';
+import BulkUploadModal from '@/components/BulkUpload/BulkUploadModal';
 
 const StudentList = () => {
   const { addPoints, unlockBadge } = useGamification();
@@ -41,10 +26,10 @@ const StudentList = () => {
       dateOfBirth: '2008-05-15',
       gender: 'Female',
       address: '123 Main St, City',
-      phone: '+1234567890',
-      email: 'alice.johnson@email.com',
-      parentName: 'Robert Johnson',
-      parentPhone: '+1234567891',
+        phone: '+1234567890',
+        email: 'alice.johnson@email.com',
+        parentName: 'Robert Johnson',
+        parentContact: '+1234567891',
       admissionDate: '2023-04-01',
       status: 'active',
       feeStatus: 'paid',
@@ -59,10 +44,10 @@ const StudentList = () => {
       dateOfBirth: '2008-08-22',
       gender: 'Male',
       address: '456 Oak Ave, City',
-      phone: '+1234567892',
+        phone: '+1234567892',
       email: 'bob.smith@email.com',
       parentName: 'Mary Smith',
-      parentPhone: '+1234567893',
+        parentContact: '+1234567893',
       admissionDate: '2023-04-01',
       status: 'active',
       feeStatus: 'pending',
@@ -77,10 +62,10 @@ const StudentList = () => {
       dateOfBirth: '2009-02-10',
       gender: 'Male',
       address: '789 Pine St, City',
-      phone: '+1234567894',
+        phone: '+1234567894',
       email: 'charlie.brown@email.com',
       parentName: 'Lisa Brown',
-      parentPhone: '+1234567895',
+        parentContact: '+1234567895',
       admissionDate: '2023-04-01',
       status: 'active',
       feeStatus: 'overdue',
@@ -98,8 +83,18 @@ const StudentList = () => {
     section: '',
     gender: '',
     parentName: '',
-    parentPhone: ''
+    phone: '',
+    parentContact: ''
   });
+
+  const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
+
+  const handleBulkUploadComplete = (results: any) => {
+    console.log('Bulk upload completed:', results);
+    setIsBulkUploadOpen(false);
+    // Refresh student list or add new students
+    addPoints(results.success * 5); // Award points for bulk upload
+  };
 
   const classes = ['Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
   const sections = ['A', 'B', 'C'];
@@ -125,7 +120,7 @@ const StudentList = () => {
         phone: newStudent.phone || '',
         email: newStudent.email || '',
         parentName: newStudent.parentName || '',
-        parentPhone: newStudent.parentPhone || '',
+        parentContact: newStudent.parentContact || '',
         admissionDate: new Date().toISOString().split('T')[0],
         status: 'active',
         feeStatus: 'pending',
@@ -170,96 +165,106 @@ const StudentList = () => {
           <h1 className="text-3xl font-bold text-gray-900">Student Management</h1>
           <p className="text-gray-600 mt-2">Earn points and badges for your actions!</p>
         </div>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="flex items-center space-x-2">
-              <Plus size={20} />
-              <span>Add Student</span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Add New Student</DialogTitle>
-            </DialogHeader>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  value={newStudent.name || ''}
-                  onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
-                  placeholder="Student name"
-                />
+        <div className="flex space-x-2">
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="flex items-center space-x-2">
+                <Plus size={20} />
+                <span>Add Student</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Add New Student</DialogTitle>
+              </DialogHeader>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    value={newStudent.name || ''}
+                    onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
+                    placeholder="Student name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="rollNumber">Roll Number</Label>
+                  <Input
+                    id="rollNumber"
+                    value={newStudent.rollNumber || ''}
+                    onChange={(e) => setNewStudent({ ...newStudent, rollNumber: e.target.value })}
+                    placeholder="Roll number"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="class">Class</Label>
+                  <Select value={newStudent.class || ''} onValueChange={(value) => setNewStudent({ ...newStudent, class: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select class" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {classes.map(cls => (
+                        <SelectItem key={cls} value={cls}>{cls}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="section">Section</Label>
+                  <Select value={newStudent.section || ''} onValueChange={(value) => setNewStudent({ ...newStudent, section: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select section" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sections.map(section => (
+                        <SelectItem key={section} value={section}>{section}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="gender">Gender</Label>
+                  <Select value={newStudent.gender || ''} onValueChange={(value) => setNewStudent({ ...newStudent, gender: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Male">Male</SelectItem>
+                      <SelectItem value="Female">Female</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="parentName">Parent Name</Label>
+                  <Input
+                    id="parentName"
+                    value={newStudent.parentName || ''}
+                    onChange={(e) => setNewStudent({ ...newStudent, parentName: e.target.value })}
+                    placeholder="Parent/Guardian name"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Label htmlFor="parentContact">Parent Contact</Label>
+                  <Input
+                    id="parentContact"
+                    value={newStudent.parentContact || ''}
+                    onChange={(e) => setNewStudent({ ...newStudent, parentContact: e.target.value })}
+                    placeholder="Parent contact number"
+                  />
+                </div>
               </div>
-              <div>
-                <Label htmlFor="rollNumber">Roll Number</Label>
-                <Input
-                  id="rollNumber"
-                  value={newStudent.rollNumber || ''}
-                  onChange={(e) => setNewStudent({ ...newStudent, rollNumber: e.target.value })}
-                  placeholder="Roll number"
-                />
-              </div>
-              <div>
-                <Label htmlFor="class">Class</Label>
-                <Select value={newStudent.class || ''} onValueChange={(value) => setNewStudent({ ...newStudent, class: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select class" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {classes.map(cls => (
-                      <SelectItem key={cls} value={cls}>{cls}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="section">Section</Label>
-                <Select value={newStudent.section || ''} onValueChange={(value) => setNewStudent({ ...newStudent, section: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select section" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sections.map(section => (
-                      <SelectItem key={section} value={section}>{section}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="gender">Gender</Label>
-                <Select value={newStudent.gender || ''} onValueChange={(value) => setNewStudent({ ...newStudent, gender: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select gender" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Male">Male</SelectItem>
-                    <SelectItem value="Female">Female</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="parentName">Parent Name</Label>
-                <Input
-                  id="parentName"
-                  value={newStudent.parentName || ''}
-                  onChange={(e) => setNewStudent({ ...newStudent, parentName: e.target.value })}
-                  placeholder="Parent/Guardian name"
-                />
-              </div>
-              <div className="col-span-2">
-                <Label htmlFor="parentPhone">Parent Phone</Label>
-                <Input
-                  id="parentPhone"
-                  value={newStudent.parentPhone || ''}
-                  onChange={(e) => setNewStudent({ ...newStudent, parentPhone: e.target.value })}
-                  placeholder="Parent contact number"
-                />
-              </div>
-            </div>
-            <Button onClick={handleAddStudent} className="w-full mt-4">Add Student</Button>
-          </DialogContent>
-        </Dialog>
+              <Button onClick={handleAddStudent} className="w-full mt-4">Add Student</Button>
+            </DialogContent>
+          </Dialog>
+          <Button
+            variant="outline"
+            onClick={() => setIsBulkUploadOpen(true)}
+            className="flex items-center space-x-2"
+          >
+            <Upload size={20} />
+            <span>Bulk Upload</span>
+          </Button>
+        </div>
       </div>
 
       <div className="flex items-center space-x-4">
@@ -320,7 +325,7 @@ const StudentList = () => {
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2 text-sm">
                     <Phone size={14} className="text-gray-400" />
-                    <span>{student.parentPhone}</span>
+                    <span>{student.parentContact}</span>
                   </div>
                   <div className="flex items-center space-x-2 text-sm">
                     <Calendar size={14} className="text-gray-400" />
@@ -340,6 +345,14 @@ const StudentList = () => {
           </Card>
         ))}
       </div>
+
+      {/* Bulk Upload Modal */}
+      <BulkUploadModal
+        isOpen={isBulkUploadOpen}
+        onClose={() => setIsBulkUploadOpen(false)}
+        entityType="students"
+        onUploadComplete={handleBulkUploadComplete}
+      />
     </div>
   );
 };

@@ -1,10 +1,13 @@
 
+export type SubscriptionPlan = 'basic' | 'premium' | 'enterprise';
+
 export interface User {
   id: string;
   name: string;
   email: string;
   role: 'admin' | 'principal' | 'teacher' | 'student' | 'parent';
   avatar?: string;
+  subscriptionPlan: SubscriptionPlan;
 }
 
 export interface Student {
@@ -15,11 +18,15 @@ export interface Student {
   section: string;
   rollNumber: string;
   dateOfBirth: string;
+  gender: string;
+  phone: string;
   parentName: string;
   parentContact: string;
   address: string;
   status: 'active' | 'inactive';
   admissionDate: string;
+  attendancePercentage?: number;
+  feeStatus?: 'paid' | 'pending' | 'overdue';
 }
 
 export interface Teacher {

@@ -38,27 +38,37 @@ const Sidebar = ({ activeTab, setActiveTab }: SidebarProps) => {
   };
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin', 'principal', 'teacher'] },
-    { id: 'students', label: 'Students', icon: Users, roles: ['admin', 'principal', 'teacher'] },
-    { id: 'teachers', label: 'Teachers', icon: GraduationCap, roles: ['admin', 'principal'] },
-    { id: 'classes', label: 'Classes', icon: BookOpen, roles: ['admin', 'principal', 'teacher'] },
-    { id: 'attendance', label: 'Attendance', icon: Calendar, roles: ['admin', 'principal', 'teacher'] },
-    { id: 'fees', label: 'Fees', icon: DollarSign, roles: ['admin', 'principal'] },
-    { id: 'exams', label: 'Exams', icon: FileText, roles: ['admin', 'principal', 'teacher'] },
-    { id: 'notices', label: 'Notices', icon: Bell, roles: ['admin', 'principal', 'teacher'] },
-    { id: 'transport', label: 'Transport', icon: Bus, roles: ['admin', 'principal'], isNew: true },
-    { id: 'inventory', label: 'Inventory', icon: Package, roles: ['admin', 'principal'], isNew: true },
-    { id: 'parent-portal', label: 'Parent Portal', icon: Smartphone, roles: ['admin', 'principal'], isNew: true },
-    { id: 'library', label: 'Library', icon: Library, roles: ['admin', 'principal', 'teacher'], isNew: true },
-    { id: 'hr-payroll', label: 'HR & Payroll', icon: UserCheck, roles: ['admin', 'principal'], isNew: true },
-    { id: 'e-learning', label: 'E-Learning', icon: Monitor, roles: ['admin', 'principal', 'teacher'], isNew: true },
-    { id: 'hostel', label: 'Hostel', icon: Bed, roles: ['admin', 'principal', 'teacher'], isNew: true },
-    { id: 'settings', label: 'Settings', icon: Settings, roles: ['admin'] },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin', 'principal', 'teacher'], subscription: 'basic' },
+    { id: 'students', label: 'Students', icon: Users, roles: ['admin', 'principal', 'teacher'], subscription: 'basic' },
+    { id: 'teachers', label: 'Teachers', icon: GraduationCap, roles: ['admin', 'principal'], subscription: 'basic' },
+    { id: 'classes', label: 'Classes', icon: BookOpen, roles: ['admin', 'principal', 'teacher'], subscription: 'basic' },
+    { id: 'attendance', label: 'Attendance', icon: Calendar, roles: ['admin', 'principal', 'teacher'], subscription: 'basic' },
+    { id: 'fees', label: 'Fees', icon: DollarSign, roles: ['admin', 'principal'], subscription: 'basic' },
+    { id: 'exams', label: 'Exams', icon: FileText, roles: ['admin', 'principal', 'teacher'], subscription: 'basic' },
+    { id: 'notices', label: 'Notices', icon: Bell, roles: ['admin', 'principal', 'teacher'], subscription: 'basic' },
+    { id: 'transport', label: 'Transport', icon: Bus, roles: ['admin', 'principal'], subscription: 'basic', isNew: true },
+    { id: 'inventory', label: 'Inventory', icon: Package, roles: ['admin', 'principal'], subscription: 'basic', isNew: true },
+    { id: 'library', label: 'Library', icon: Library, roles: ['admin', 'principal', 'teacher'], subscription: 'premium', isNew: true },
+    { id: 'hr-payroll', label: 'HR & Payroll', icon: UserCheck, roles: ['admin', 'principal'], subscription: 'basic', isNew: true },
+    { id: 'e-learning', label: 'E-Learning', icon: Monitor, roles: ['admin', 'principal', 'teacher'], subscription: 'premium', isNew: true },
+    { id: 'hostel', label: 'Hostel', icon: Bed, roles: ['admin', 'principal', 'teacher'], subscription: 'enterprise', isNew: true },
+    { id: 'settings', label: 'Settings', icon: Settings, roles: ['admin'], subscription: 'basic' },
   ];
 
-  const filteredMenuItems = menuItems.filter(item =>
-    user?.role && item.roles.includes(user.role)
-  );
+  // Subscription plan hierarchy: basic (1) < premium (2) < enterprise (3)
+  const planHierarchy = {
+    basic: 1,
+    premium: 2,
+    enterprise: 3
+  };
+
+  const filteredMenuItems = menuItems.filter(item => {
+    const hasRole = user?.role && item.roles.includes(user.role);
+    const userPlanLevel = planHierarchy[user?.subscriptionPlan || 'basic'];
+    const requiredPlanLevel = planHierarchy[item.subscription as keyof typeof planHierarchy];
+    const hasSubscription = userPlanLevel >= requiredPlanLevel;
+    return hasRole && hasSubscription;
+  });
 
   return (
     <div className="w-64 h-[calc(100vh-4rem)] fixed top-16 left-0 z-20 bg-white border-r shadow flex flex-col">
