@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SchoolERPAPI.Data;
 using SchoolERPAPI.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using SchoolERP.API.Data;
+using SchoolERP.API.Models;
+using System;
 
 namespace SchoolERPAPI.Controllers
 {
@@ -43,10 +45,9 @@ namespace SchoolERPAPI.Controllers
                 sp.Student.FirstName,
                 sp.Student.LastName,
                 sp.Student.RollNumber,
-                sp.Student.Class,
-                sp.Student.Section,
+                ClassName = sp.Student.Class?.Name ?? "Not Assigned",
                 sp.Student.Email,
-                Relationship = sp.Relationship
+                Relationship = sp.RelationshipType
             });
 
             return Ok(new { success = true, data = children });
@@ -59,10 +60,6 @@ namespace SchoolERPAPI.Controllers
             var parent = await _context.Parents
                 .Include(p => p.StudentParents)
                     .ThenInclude(sp => sp.Student)
-                        .ThenInclude(s => s.AttendanceRecords)
-                .Include(p => p.StudentParents)
-                    .ThenInclude(sp => sp.Student)
-                        .ThenInclude(s => s.Grades)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (parent == null)
@@ -76,19 +73,21 @@ namespace SchoolERPAPI.Controllers
             {
                 var student = studentParent.Student;
 
-                // Get recent attendance (last 30 days)
+                // Get recent attendance (last 30 days) - query from database
                 var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
-                var recentAttendance = student.AttendanceRecords
-                    .Where(ar => ar.Date >= thirtyDaysAgo)
+                var recentAttendance = await _context.AttendanceRecords
+                    .Where(ar => ar.StudentId == student.Id && ar.Date >= thirtyDaysAgo)
                     .OrderByDescending(ar => ar.Date)
                     .Take(10)
-                    .ToList();
+                    .ToListAsync();
 
-                // Get recent grades
-                var recentGrades = student.Grades
+                // Get recent grades - query from database
+                var recentGrades = await _context.Grades
+                    .Where(g => g.StudentId == student.Id)
+                    .Include(g => g.Subject)
                     .OrderByDescending(g => g.CreatedAt)
                     .Take(5)
-                    .ToList();
+                    .ToListAsync();
 
                 // Calculate attendance percentage
                 var attendancePercentage = recentAttendance.Count > 0
@@ -106,8 +105,7 @@ namespace SchoolERPAPI.Controllers
                     student.FirstName,
                     student.LastName,
                     student.RollNumber,
-                    student.Class,
-                    student.Section,
+                    ClassName = student.Class?.Name ?? "Not Assigned",
                     AttendancePercentage = Math.Round(attendancePercentage, 1),
                     RecentAttendance = recentAttendance.Select(ar => new
                     {
@@ -124,13 +122,13 @@ namespace SchoolERPAPI.Controllers
                         g.ExamType,
                         g.MarksObtained,
                         g.TotalMarks,
-                        g.Grade,
+                        g.GradeLetter,
                         g.ExamDate
                     }),
                     PendingFees = pendingFees,
                     HomeworkCount = 0, // TODO: Implement homework tracking
                     MessagesCount = await _context.ParentMessages
-                        .CountAsync(pm => pm.ParentId == parent.Id && !pm.IsRead)
+                        .CountAsync(pm => pm.SenderId == parent.Id && !pm.IsRead)
                 });
             }
 
@@ -145,7 +143,7 @@ namespace SchoolERPAPI.Controllers
                         parent.FirstName,
                         parent.LastName,
                         parent.Email,
-                        parent.PhoneNumber
+                        parent.Phone
                     },
                     children = children,
                     summary = new
@@ -203,8 +201,7 @@ namespace SchoolERPAPI.Controllers
                         ar.Student.Id,
                         ar.Student.FirstName,
                         ar.Student.LastName,
-                        ar.Student.Class,
-                        ar.Student.Section
+                        ClassName = ar.Student.Class != null ? ar.Student.Class.Name : "Not Assigned"
                     }
                 })
                 .ToListAsync();
@@ -262,7 +259,7 @@ namespace SchoolERPAPI.Controllers
                     g.ExamType,
                     g.MarksObtained,
                     g.TotalMarks,
-                    g.Grade,
+                    g.GradeLetter,
                     g.Remarks,
                     g.ExamDate,
                     Subject = g.Subject != null ? new { g.Subject.Id, g.Subject.Name } : null,
@@ -271,8 +268,7 @@ namespace SchoolERPAPI.Controllers
                         g.Student.Id,
                         g.Student.FirstName,
                         g.Student.LastName,
-                        g.Student.Class,
-                        g.Student.Section
+                        ClassName = g.Student.Class != null ? g.Student.Class.Name : "Not Assigned"
                     }
                 })
                 .ToListAsync();
@@ -285,9 +281,9 @@ namespace SchoolERPAPI.Controllers
                 {
                     totalGrades = grades.Count,
                     averagePercentage = grades.Count > 0
-                        ? Math.Round(grades.Average(g => g.TotalMarks > 0 ? (double)g.MarksObtained / g.TotalMarks * 100 : 0), 2)
+                        ? Math.Round(grades.Average(g => g.TotalMarks != null && g.TotalMarks > 0 ? (double)g.MarksObtained / g.TotalMarks * 100 : 0), 2)
                         : 0,
-                    gradeDistribution = grades.GroupBy(g => g.Grade)
+                    gradeDistribution = grades.GroupBy(g => g.GradeLetter)
                         .Select(group => new { Grade = group.Key, Count = group.Count() })
                 }
             });
@@ -339,7 +335,7 @@ namespace SchoolERPAPI.Controllers
                         sf.Student.Id,
                         sf.Student.FirstName,
                         sf.Student.LastName,
-                        sf.Student.Class
+                        ClassName = sf.Student.Class != null ? sf.Student.Class.Name : "Not Assigned"
                     },
                     FeeStructure = sf.FeeStructure != null ? new { sf.FeeStructure.Id, sf.FeeStructure.Name } : null
                 })
@@ -371,7 +367,7 @@ namespace SchoolERPAPI.Controllers
             }
 
             var query = _context.ParentMessages
-                .Where(pm => pm.ParentId == id)
+                .Where(pm => pm.SenderId == id)
                 .Include(pm => pm.Sender)
                 .Include(pm => pm.Student)
                 .AsQueryable();
@@ -397,14 +393,14 @@ namespace SchoolERPAPI.Controllers
                         pm.Sender.Id,
                         pm.Sender.FirstName,
                         pm.Sender.LastName,
-                        pm.Sender.Role
+                        Role = "Parent"
                     } : null,
                     Student = pm.Student != null ? new
                     {
                         pm.Student.Id,
                         pm.Student.FirstName,
                         pm.Student.LastName,
-                        pm.Student.Class
+                        ClassName = pm.Student.Class != null ? pm.Student.Class.Name : "Not Assigned"
                     } : null
                 })
                 .ToListAsync();
@@ -427,7 +423,7 @@ namespace SchoolERPAPI.Controllers
         public async Task<IActionResult> MarkMessageAsRead(int id, int messageId)
         {
             var message = await _context.ParentMessages
-                .FirstOrDefaultAsync(pm => pm.Id == messageId && pm.ParentId == id);
+                .FirstOrDefaultAsync(pm => pm.Id == messageId && pm.SenderId == id);
 
             if (message == null)
             {
@@ -435,7 +431,6 @@ namespace SchoolERPAPI.Controllers
             }
 
             message.IsRead = true;
-            message.ReadAt = DateTime.UtcNow;
 
             try
             {

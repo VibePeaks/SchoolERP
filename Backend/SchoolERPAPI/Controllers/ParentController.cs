@@ -41,8 +41,8 @@ namespace SchoolERP.API.Controllers
                     sp.Student.AttendancePercentage,
                     LatestGrade = _context.Grades
                         .Where(g => g.StudentId == sp.Student.Id)
-                        .OrderByDescending(g => g.GradedDate)
-                        .Select(g => g.LetterGrade)
+                        .OrderByDescending(g => g.ExamDate)
+                        .Select(g => g.GradeLetter)
                         .FirstOrDefault()
                 })
                 .ToListAsync();
@@ -144,20 +144,21 @@ namespace SchoolERP.API.Controllers
             var grades = await _context.Grades
                 .Where(g => g.StudentId == studentId)
                 .Include(g => g.Class)
-                .OrderByDescending(g => g.GradedDate)
+                .Include(g => g.Subject)
+                .OrderByDescending(g => g.ExamDate)
                 .Select(g => new
                 {
                     g.Id,
-                    g.Subject,
-                    g.Title,
-                    g.Score,
-                    g.MaxScore,
+                    Subject = g.Subject != null ? g.Subject.Name : null,
+                    ExamType = g.ExamType,
+                    MarksObtained = g.MarksObtained,
+                    TotalMarks = g.TotalMarks,
                     g.Percentage,
-                    g.LetterGrade,
-                    g.Comments,
-                    g.GradedDate,
+                    g.GradeLetter,
+                    Remarks = g.Remarks,
+                    g.ExamDate,
                     TeacherName = _context.Users
-                        .Where(u => u.Id == g.GradedBy)
+                        .Where(u => u.Id == g.TeacherId)
                         .Select(u => u.FirstName + " " + u.LastName)
                         .FirstOrDefault()
                 })

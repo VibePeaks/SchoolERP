@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SchoolERP.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using SchoolERP.API.Data;
 
 namespace SchoolERP.API.Controllers
 {

@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SchoolERPAPI.Data;
 using SchoolERPAPI.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using SchoolERP.API.Data;
+using SchoolERP.API.Models;
 
 namespace SchoolERPAPI.Controllers
 {
@@ -46,7 +47,7 @@ namespace SchoolERPAPI.Controllers
 
             if (!string.IsNullOrEmpty(className))
             {
-                query = query.Where(s => s.Class == className);
+                query = query.Where(s => s.Class != null && s.Class.Name == className);
             }
 
             var totalCount = await query.CountAsync();
@@ -60,13 +61,13 @@ namespace SchoolERPAPI.Controllers
                     s.LastName,
                     s.RollNumber,
                     s.Email,
-                    s.Class,
-                    s.Section,
+                    ClassName = s.Class != null ? s.Class.Name : "Not Assigned",
+                    Section = s.Class != null ? s.Class.Section : "Not Assigned",
                     s.DateOfBirth,
                     s.Gender,
                     s.Address,
-                    s.PhoneNumber,
-                    s.IsActive,
+                    s.Phone,
+                    Status = s.Status.ToString(),
                     Branch = s.Branch != null ? new { s.Branch.Id, s.Branch.Name } : null,
                     Parents = s.StudentParents.Select(sp => new
                     {
@@ -74,7 +75,7 @@ namespace SchoolERPAPI.Controllers
                         sp.Parent.FirstName,
                         sp.Parent.LastName,
                         sp.Parent.Email,
-                        sp.Parent.PhoneNumber
+                        sp.Parent.Phone
                     })
                 })
                 .ToListAsync();
@@ -102,7 +103,6 @@ namespace SchoolERPAPI.Controllers
                 .Include(s => s.StudentParents)
                     .ThenInclude(sp => sp.Parent)
                 .Include(s => s.AttendanceRecords)
-                .Include(s => s.Grades)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (student == null)
@@ -120,13 +120,13 @@ namespace SchoolERPAPI.Controllers
                     student.LastName,
                     student.RollNumber,
                     student.Email,
-                    student.Class,
-                    student.Section,
+                    ClassName = student.Class != null ? student.Class.Name : "Not Assigned",
+                    Section = student.Class != null ? student.Class.Section : "Not Assigned",
                     student.DateOfBirth,
                     student.Gender,
                     student.Address,
-                    student.PhoneNumber,
-                    student.IsActive,
+                    student.Phone,
+                    Status = student.Status.ToString(),
                     student.CreatedAt,
                     student.UpdatedAt,
                     Branch = student.Branch != null ? new { student.Branch.Id, student.Branch.Name } : null,
@@ -136,7 +136,7 @@ namespace SchoolERPAPI.Controllers
                         sp.Parent.FirstName,
                         sp.Parent.LastName,
                         sp.Parent.Email,
-                        sp.Parent.PhoneNumber
+                        sp.Parent.Phone
                     }),
                     AttendanceSummary = new
                     {
@@ -144,8 +144,7 @@ namespace SchoolERPAPI.Controllers
                         PresentDays = student.AttendanceRecords.Count(ar => ar.Status == "present"),
                         AbsentDays = student.AttendanceRecords.Count(ar => ar.Status == "absent"),
                         LateDays = student.AttendanceRecords.Count(ar => ar.Status == "late")
-                    },
-                    RecentGrades = student.Grades.OrderByDescending(g => g.CreatedAt).Take(5)
+                    }
                 }
             });
         }
@@ -169,6 +168,15 @@ namespace SchoolERPAPI.Controllers
 
             try
             {
+                // Find the class by name and section
+                var classEntity = await _context.Classes
+                    .FirstOrDefaultAsync(c => c.Name == request.Class && c.Section == request.Section);
+
+                if (classEntity == null)
+                {
+                    return BadRequest(new { success = false, message = "Class not found" });
+                }
+
                 // Create student
                 var student = new Student
                 {
@@ -176,13 +184,12 @@ namespace SchoolERPAPI.Controllers
                     LastName = request.LastName,
                     RollNumber = request.RollNumber,
                     Email = request.Email,
-                    Class = request.Class,
-                    Section = request.Section,
+                    ClassId = classEntity.Id,
                     DateOfBirth = request.DateOfBirth,
                     Gender = request.Gender,
                     Address = request.Address,
-                    PhoneNumber = request.PhoneNumber,
-                    IsActive = true
+                    Phone = request.PhoneNumber,
+                    Status = StudentStatus.Active
                 };
 
                 _context.Students.Add(student);
@@ -201,7 +208,7 @@ namespace SchoolERPAPI.Controllers
                             FirstName = request.ParentName?.Split(' ').FirstOrDefault() ?? "Parent",
                             LastName = request.ParentName?.Split(' ').LastOrDefault() ?? "",
                             Email = request.ParentEmail,
-                            PhoneNumber = request.ParentContact,
+                            Phone = request.ParentContact,
                             IsActive = true
                         };
                         _context.Parents.Add(parent);
@@ -215,7 +222,7 @@ namespace SchoolERPAPI.Controllers
                         {
                             StudentId = student.Id,
                             ParentId = parent.Id,
-                            Relationship = "Parent"
+                            RelationshipType = "Parent"
                         };
                         _context.StudentParents.Add(studentParent);
                         await _context.SaveChangesAsync();
@@ -249,11 +256,21 @@ namespace SchoolERPAPI.Controllers
             if (!string.IsNullOrEmpty(request.FirstName)) student.FirstName = request.FirstName;
             if (!string.IsNullOrEmpty(request.LastName)) student.LastName = request.LastName;
             if (!string.IsNullOrEmpty(request.Email)) student.Email = request.Email;
-            if (!string.IsNullOrEmpty(request.Class)) student.Class = request.Class;
-            if (!string.IsNullOrEmpty(request.Section)) student.Section = request.Section;
+
+            // Update class if provided
+            if (!string.IsNullOrEmpty(request.Class) && !string.IsNullOrEmpty(request.Section))
+            {
+                var classEntity = await _context.Classes
+                    .FirstOrDefaultAsync(c => c.Name == request.Class && c.Section == request.Section);
+                if (classEntity != null)
+                {
+                    student.ClassId = classEntity.Id;
+                }
+            }
+
             if (request.DateOfBirth.HasValue) student.DateOfBirth = request.DateOfBirth.Value;
             if (!string.IsNullOrEmpty(request.Address)) student.Address = request.Address;
-            if (!string.IsNullOrEmpty(request.PhoneNumber)) student.PhoneNumber = request.PhoneNumber;
+            if (!string.IsNullOrEmpty(request.PhoneNumber)) student.Phone = request.PhoneNumber;
 
             student.UpdatedAt = DateTime.UtcNow;
 
@@ -280,7 +297,7 @@ namespace SchoolERPAPI.Controllers
             }
 
             // Soft delete
-            student.IsActive = false;
+            student.Status = StudentStatus.Inactive;
             student.UpdatedAt = DateTime.UtcNow;
 
             try
@@ -321,8 +338,7 @@ namespace SchoolERPAPI.Controllers
                     ar.Status,
                     ar.Subject,
                     ar.Remarks,
-                    ar.MarkedBy,
-                    ar.CreatedAt
+                    ar.MarkedBy
                 })
                 .ToListAsync();
 
@@ -365,7 +381,7 @@ namespace SchoolERPAPI.Controllers
                     g.ExamType,
                     g.MarksObtained,
                     g.TotalMarks,
-                    g.Grade,
+                    g.GradeLetter,
                     g.Remarks,
                     g.ExamDate,
                     g.CreatedAt
@@ -382,7 +398,7 @@ namespace SchoolERPAPI.Controllers
                     averagePercentage = grades.Count > 0
                         ? Math.Round(grades.Average(g => g.TotalMarks > 0 ? (double)g.MarksObtained / g.TotalMarks * 100 : 0), 2)
                         : 0,
-                    gradeDistribution = grades.GroupBy(g => g.Grade)
+                    gradeDistribution = grades.GroupBy(g => g.GradeLetter)
                         .Select(group => new { Grade = group.Key, Count = group.Count() })
                 }
             });

@@ -3,6 +3,7 @@ using SchoolERP.API.Models;
 using System.Linq;
 using System.Linq.Expressions;
 using System;
+using SchoolERP.API.Middleware;
 
 namespace SchoolERP.API.Data
 {
@@ -45,7 +46,8 @@ namespace SchoolERP.API.Data
         public DbSet<AssignmentSubmission> AssignmentSubmissions { get; set; }
         public DbSet<Grade> Grades { get; set; }
         public DbSet<StudentProgressReport> StudentProgressReports { get; set; }
-        public DbSet<StudentAchievement> StudentAchievements { get; set; }
+        public DbSet<StudentAcademicAchievement> StudentAcademicAchievements { get; set; }
+        public DbSet<StudentAchievement> StudentAchievements { get; set; } // Gamification achievements
         public DbSet<LearningObjective> LearningObjectives { get; set; }
         public DbSet<StudentLearningProgress> StudentLearningProgress { get; set; }
 
@@ -79,7 +81,6 @@ namespace SchoolERP.API.Data
 
         // Notices & Communication
         public DbSet<Notice> Notices { get; set; }
-        public DbSet<ParentMessage> ParentMessages { get; set; }
 
         // E-Learning
         public DbSet<Course> Courses { get; set; }
@@ -87,7 +88,6 @@ namespace SchoolERP.API.Data
 
         // Gamification
         public DbSet<Reward> Rewards { get; set; }
-        public DbSet<StudentAchievement> StudentAchievements { get; set; }
 
         // Hostel Management
         public DbSet<Hostel> Hostels { get; set; }
@@ -96,6 +96,9 @@ namespace SchoolERP.API.Data
 
         // Audit Logging
         public DbSet<AuditLog> AuditLogs { get; set; }
+
+        // Student Mode Audit
+        public DbSet<StudentModeAudit> StudentModeAudit { get; set; }
 
         // Bus Tracking System
         public DbSet<BusLocation> BusLocations { get; set; }
@@ -185,9 +188,6 @@ namespace SchoolERP.API.Data
 
             // Parent relationships
             modelBuilder.Entity<StudentParent>()
-                .HasKey(sp => new { sp.StudentId, sp.ParentId });
-
-            modelBuilder.Entity<StudentParent>()
                 .HasOne(sp => sp.Student)
                 .WithMany(s => s.StudentParents)
                 .HasForeignKey(sp => sp.StudentId);
@@ -229,6 +229,18 @@ namespace SchoolERP.API.Data
                 .HasOne(pn => pn.RelatedStudent)
                 .WithMany()
                 .HasForeignKey(pn => pn.RelatedStudentId);
+
+            // Gamification relationships
+            modelBuilder.Entity<StudentAchievement>()
+                .HasOne(sa => sa.Reward)
+                .WithMany()
+                .HasForeignKey(sa => sa.RewardId);
+
+            // Payroll relationships
+            modelBuilder.Entity<PayrollRecord>()
+                .HasOne(pr => pr.Employee)
+                .WithMany()
+                .HasForeignKey(pr => pr.EmployeeId);
         }
 
         private LambdaExpression CreateTenantFilter(Type entityType)

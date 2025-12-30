@@ -25,11 +25,8 @@ namespace SchoolERP.API.Controllers
         [HttpGet("locations")]
         public async Task<IActionResult> GetBusLocations([FromQuery] int? busId = null)
         {
-            var tenantId = GetCurrentTenantId();
-
             var query = _context.BusLocations
-                .Include(bl => bl.Bus)
-                .Where(bl => bl.TenantId == tenantId && bl.IsActive);
+                .Where(bl => bl.IsActive);
 
             if (busId.HasValue)
             {
@@ -44,7 +41,10 @@ namespace SchoolERP.API.Controllers
                 {
                     bl.Id,
                     bl.BusId,
-                    BusNumber = bl.Bus.RegistrationNumber,
+                    BusNumber = _context.Buses
+                        .Where(b => b.Id == bl.BusId)
+                        .Select(b => b.RegistrationNumber)
+                        .FirstOrDefault(),
                     bl.Latitude,
                     bl.Longitude,
                     bl.Speed,
@@ -56,16 +56,11 @@ namespace SchoolERP.API.Controllers
                     bl.EstimatedArrival,
                     LastUpdate = bl.Timestamp,
                     StudentsOnBoard = _context.TransportAssignments
-                        .Count(ta => ta.BusId == bl.BusId && ta.IsActive),
-                    DriverName = _context.Users
-                        .Where(u => u.Id == bl.Bus.DriverId)
-                        .Select(u => u.FirstName + " " + u.LastName)
+                        .Count(ta => ta.RouteId == bl.RouteId && ta.IsActive),
+                    RouteName = _context.TransportRoutes
+                        .Where(tr => tr.Id == bl.RouteId)
+                        .Select(tr => tr.RouteName)
                         .FirstOrDefault(),
-                    DriverPhone = _context.Users
-                        .Where(u => u.Id == bl.Bus.DriverId)
-                        .Select(u => u.Phone)
-                        .FirstOrDefault(),
-                    RouteName = bl.Route != null ? bl.Route.RouteName : null,
                     bl.IsEmergency,
                     bl.EmergencyMessage
                 })
@@ -93,27 +88,36 @@ namespace SchoolERP.API.Controllers
             // Get transport assignments for these students
             var assignments = await _context.TransportAssignments
                 .Where(ta => studentIds.Contains(ta.StudentId) && ta.IsActive)
-                .Include(ta => ta.Student)
-                .Include(ta => ta.Bus)
-                .Include(ta => ta.Route)
-                .Select(ta => new
-                {
-                    StudentId = ta.Student.Id,
-                    StudentName = ta.Student.FirstName + " " + ta.Student.LastName,
-                    BusId = ta.Bus.Id,
-                    BusNumber = ta.Bus.RegistrationNumber,
-                    PickupStop = ta.PickupPoint,
-                    DropStop = ta.DropPoint,
-                    RouteName = ta.Route.RouteName,
-                    // Mock status - in real app, this would be calculated from current trip
-                    Status = "on_route"
-                })
                 .ToListAsync();
 
+            var studentAssignments = new List<object>();
+            foreach (var ta in assignments)
+            {
+                var student = await _context.Students.FindAsync(ta.StudentId);
+                var route = await _context.TransportRoutes.FindAsync(ta.RouteId);
+                var bus = route != null ? await _context.Buses.FindAsync(route.BusId) : null;
+
+                studentAssignments.Add(new
+                {
+                    StudentId = student?.Id ?? ta.StudentId,
+                    StudentName = student != null ? $"{student.FirstName} {student.LastName}" : "Unknown",
+                    BusId = bus?.Id ?? 0,
+                    BusNumber = bus?.RegistrationNumber ?? "Unknown",
+                    RouteName = route?.RouteName ?? "Unknown",
+                    Status = "on_route"
+                });
+            }
+
             // Get current bus locations for assigned buses
-            var busIds = assignments.Select(a => a.BusId).Distinct().ToList();
+            var busIds = assignments.Select(a => a.RouteId).Distinct().ToList();
+            var routeBusIds = await _context.TransportRoutes
+                .Where(tr => busIds.Contains(tr.Id))
+                .Select(tr => tr.BusId)
+                .Distinct()
+                .ToListAsync();
+
             var busLocations = await _context.BusLocations
-                .Where(bl => busIds.Contains(bl.BusId) && bl.IsActive)
+                .Where(bl => routeBusIds.Contains(bl.BusId) && bl.IsActive)
                 .GroupBy(bl => bl.BusId)
                 .Select(g => g.OrderByDescending(bl => bl.Timestamp).First())
                 .Select(bl => new
@@ -128,17 +132,13 @@ namespace SchoolERP.API.Controllers
                     bl.EstimatedArrival,
                     LastUpdate = bl.Timestamp,
                     StudentsOnBoard = _context.TransportAssignments
-                        .Count(ta => ta.BusId == bl.BusId && ta.IsActive),
-                    DriverName = _context.Users
-                        .Where(u => u.Id == bl.Bus.DriverId)
-                        .Select(u => u.FirstName + " " + u.LastName)
-                        .FirstOrDefault()
+                        .Count(ta => ta.RouteId == bl.RouteId && ta.IsActive)
                 })
                 .ToListAsync();
 
             return Ok(new
             {
-                students = assignments,
+                students = studentAssignments,
                 buses = busLocations
             });
         }
@@ -147,46 +147,16 @@ namespace SchoolERP.API.Controllers
         [HttpGet("routes/{routeId}")]
         public async Task<IActionResult> GetRouteDetails(int routeId)
         {
-            var tenantId = GetCurrentTenantId();
-
             var route = await _context.TransportRoutes
-                .Include(r => r.TransportAssignments.Where(ta => ta.IsActive))
-                .FirstOrDefaultAsync(r => r.Id == routeId && r.TenantId == tenantId);
+                .FirstOrDefaultAsync(r => r.Id == routeId);
 
             if (route == null)
                 return NotFound("Route not found");
 
-            var stops = await _context.BusRouteStops
-                .Where(brs => brs.RouteId == routeId)
-                .OrderBy(brs => brs.OrderIndex)
-                .Select(brs => new
-                {
-                    brs.Id,
-                    brs.StopName,
-                    brs.Latitude,
-                    brs.Longitude,
-                    brs.ScheduledArrival,
-                    brs.ScheduledDeparture,
-                    brs.StudentsPickup,
-                    brs.StudentsDropoff,
-                    brs.Facilities
-                })
-                .ToListAsync();
+            var studentCount = await _context.TransportAssignments
+                .CountAsync(ta => ta.RouteId == routeId && ta.IsActive);
 
-            var buses = await _context.Buses
-                .Where(b => b.RouteId == routeId && b.IsActive)
-                .Select(b => new
-                {
-                    b.Id,
-                    b.RegistrationNumber,
-                    b.BusNumber,
-                    b.Capacity,
-                    DriverName = _context.Users
-                        .Where(u => u.Id == b.DriverId)
-                        .Select(u => u.FirstName + " " + u.LastName)
-                        .FirstOrDefault()
-                })
-                .ToListAsync();
+            var bus = await _context.Buses.FirstOrDefaultAsync(b => b.Id == route.BusId);
 
             return Ok(new
             {
@@ -194,16 +164,20 @@ namespace SchoolERP.API.Controllers
                 {
                     route.Id,
                     route.RouteName,
-                    route.RouteNumber,
                     route.StartPoint,
                     route.EndPoint,
-                    route.Distance,
-                    route.EstimatedTime,
-                    route.Fare,
-                    StudentCount = route.TransportAssignments.Count
+                    route.Stops,
+                    route.MonthlyFee,
+                    StudentCount = studentCount
                 },
-                stops,
-                buses
+                bus = bus != null ? new
+                {
+                    bus.Id,
+                    bus.RegistrationNumber,
+                    bus.Capacity,
+                    bus.DriverName,
+                    bus.DriverContact
+                } : null
             });
         }
 
@@ -302,10 +276,14 @@ namespace SchoolERP.API.Controllers
                     ba.ResolvedAt,
                     ba.Latitude,
                     ba.Longitude,
-                    BusNumber = ba.Bus.RegistrationNumber,
-                    StudentName = ba.RelatedStudent != null
-                        ? ba.RelatedStudent.FirstName + " " + ba.RelatedStudent.LastName
-                        : null
+                    BusNumber = _context.Buses
+                        .Where(b => b.Id == ba.BusId)
+                        .Select(b => b.RegistrationNumber)
+                        .FirstOrDefault(),
+                    StudentName = _context.Students
+                        .Where(s => s.Id == ba.StudentId)
+                        .Select(s => s.FirstName + " " + s.LastName)
+                        .FirstOrDefault()
                 })
                 .ToListAsync();
 
@@ -366,7 +344,7 @@ namespace SchoolERP.API.Controllers
                     bt.DistanceTravelled,
                     bt.StudentsPickedUp,
                     bt.StudentsDroppedOff,
-                    Duration = bt.ActualDuration?.ToString(@"hh\:mm\:ss")
+                    Duration = bt.ActualDuration.HasValue ? bt.ActualDuration.Value.ToString(@"hh\:mm\:ss") : null
                 })
                 .ToListAsync();
 
@@ -432,7 +410,7 @@ namespace SchoolERP.API.Controllers
                 var distance = CalculateDistance(latitude, longitude,
                     geofence.CenterLatitude, geofence.CenterLongitude);
 
-                if (distance <= geofence.Radius)
+                if (distance <= (double)geofence.Radius)
                 {
                     // Bus is inside geofence - trigger entry action
                     await TriggerGeofenceAction(geofence, busId, "entry", latitude, longitude);
@@ -443,13 +421,14 @@ namespace SchoolERP.API.Controllers
         private async Task TriggerGeofenceAction(BusGeofence geofence, int busId, string actionType, decimal lat, decimal lng)
         {
             // Create alert based on geofence action
+            var geofenceName = geofence.Name ?? "Unknown Geofence";
             var alert = new BusAlert
             {
                 BusId = busId,
                 Type = actionType == "entry" ? AlertType.Safety : AlertType.Safety,
                 Severity = AlertSeverity.Low,
-                Title = $"{geofence.Name} - Bus {actionType}",
-                Message = $"Bus entered {geofence.Name} geofence area",
+                Title = $"{geofenceName} - Bus {actionType}",
+                Message = $"Bus entered {geofenceName} geofence area",
                 Timestamp = DateTime.UtcNow,
                 Latitude = lat,
                 Longitude = lng,

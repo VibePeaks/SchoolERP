@@ -45,7 +45,7 @@ namespace SchoolERPAPI.Middleware
                 context.Connection.RemoteIpAddress?.ToString());
 
             // Determine the appropriate HTTP status code and error type
-            var (statusCode, errorType) = GetErrorDetails(exception);
+            (HttpStatusCode statusCode, string errorType) = GetErrorDetails(exception);
 
             var errorResponse = new ErrorResponse
             {
@@ -56,7 +56,7 @@ namespace SchoolERPAPI.Middleware
                 Message = GetUserFriendlyMessage(exception, errorType),
                 Path = context.Request.Path,
                 Method = context.Request.Method,
-                Details = GetErrorDetails(exception)
+                Details = GetSanitizedErrorDetails(exception)
             };
 
             // Add additional debugging info in development
@@ -87,8 +87,8 @@ namespace SchoolERPAPI.Middleware
                 UnauthorizedAccessException => (HttpStatusCode.Unauthorized, "UNAUTHORIZED"),
                 KeyNotFoundException => (HttpStatusCode.NotFound, "NOT_FOUND"),
                 TimeoutException => (HttpStatusCode.RequestTimeout, "TIMEOUT"),
-                Microsoft.EntityFrameworkCore.DbUpdateException => (HttpStatusCode.Conflict, "DATABASE_CONFLICT"),
                 Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException => (HttpStatusCode.Conflict, "CONCURRENCY_CONFLICT"),
+                Microsoft.EntityFrameworkCore.DbUpdateException => (HttpStatusCode.Conflict, "DATABASE_CONFLICT"),
                 _ => (HttpStatusCode.InternalServerError, "INTERNAL_SERVER_ERROR")
             };
         }
@@ -108,7 +108,7 @@ namespace SchoolERPAPI.Middleware
             };
         }
 
-        private object GetErrorDetails(Exception exception)
+        private object GetSanitizedErrorDetails(Exception exception)
         {
             // Return sanitized error details
             return new

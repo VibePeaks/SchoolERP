@@ -1,6 +1,7 @@
 using Stripe;
 using Microsoft.Extensions.Configuration;
 using SchoolERP.API.Models;
+using SchoolERP.API.Data;
 
 namespace SchoolERP.API.Services
 {
@@ -58,8 +59,7 @@ namespace SchoolERP.API.Services
                     },
                     ProductData = new PriceProductDataOptions
                     {
-                        Name = $"{planName} Plan - {billingCycle}",
-                        Description = $"SchoolERP {planName} subscription plan"
+                        Name = $"{planName} Plan - {billingCycle}"
                     }
                 };
 
@@ -77,16 +77,22 @@ namespace SchoolERP.API.Services
                             Price = price.Id
                         }
                     },
-                    PaymentBehavior = "default_incomplete",
-                    Expand = new List<string> { "latest_invoice.payment_intent" }
+                    PaymentBehavior = "default_incomplete"
                 };
 
                 var subscription = await subscriptionService.CreateAsync(subscriptionOptions);
 
+                // Retrieve the invoice with payment intent expanded
+                var invoiceService = new InvoiceService();
+                var invoice = await invoiceService.GetAsync(subscription.LatestInvoiceId, new InvoiceGetOptions
+                {
+                    Expand = new List<string> { "payment_intent" }
+                });
+
                 return new PaymentResult
                 {
                     Success = true,
-                    ClientSecret = subscription.LatestInvoice.PaymentIntent.ClientSecret,
+                    ClientSecret = ((dynamic)invoice).PaymentIntent.ClientSecret,
                     SubscriptionId = subscription.Id,
                     CustomerId = customer.Id
                 };

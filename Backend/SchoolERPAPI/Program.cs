@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SchoolERP.API.Data;
+using SchoolERP.API.Hubs;
 using SchoolERP.API.Middleware;
 using SchoolERP.API.Services;
 using SchoolERPAPI.Middleware;
@@ -123,7 +124,8 @@ app.MapGet("/api/test-db", async (AppDbContext db) =>
     try
     {
         var tenants = await db.Tenants.CountAsync();
-        return Results.Ok(new {
+        return Results.Ok(new
+        {
             status = "Connected",
             tenantCount = tenants,
             server = "Azure SQL Database",

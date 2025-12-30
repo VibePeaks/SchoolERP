@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SchoolERPAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7b5d0a8215ff815a79c291049a50fcc5ac0b565d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+31350fad0a704a141051b0d841423576198b0ce0")]
 [assembly: System.Reflection.AssemblyProductAttribute("SchoolERPAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SchoolERPAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
