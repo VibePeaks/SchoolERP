@@ -16,6 +16,7 @@ namespace SchoolERP.API.Models
         public bool IsActive { get; set; } = true;
         public string SubscriptionPlan { get; set; } = "basic"; // Institution-wide plan
         public int MaxUsers { get; set; } = 100;
+        public int MaxBranches { get; set; } = 1;
         public int MaxStorageGB { get; set; } = 10;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

@@ -51,7 +51,7 @@ namespace SchoolERP.API.Models
         Returned
     }
 
-    public class Grade : BaseEntity
+    public class AssignmentGrade : BaseEntity
     {
         public int StudentId { get; set; }
         public Student Student { get; set; }
@@ -107,7 +107,7 @@ namespace SchoolERP.API.Models
         public User PreparedByUser { get; set; }
     }
 
-    public class StudentAchievement : BaseEntity
+    public class StudentAcademicAchievement : BaseEntity
     {
         public int StudentId { get; set; }
         public Student Student { get; set; }

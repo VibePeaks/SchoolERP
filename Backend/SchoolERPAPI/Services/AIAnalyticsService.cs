@@ -160,7 +160,8 @@ namespace SchoolERP.API.Services
         {
             var subscriptions = await _context.UserSubscriptions
                 .Include(us => us.SubscriptionPlan)
-                .Where(us => us.TenantId == tenantId && us.Status == "active")
+                .Include(us => us.User)
+                .Where(us => us.User.TenantId == tenantId && us.Status == "active")
                 .ToListAsync();
 
             var currentRevenue = subscriptions.Sum(us => us.SubscriptionPlan.Price);
@@ -172,12 +173,12 @@ namespace SchoolERP.API.Services
 
             for (int i = 0; i < monthsAhead; i++)
             {
-                predictedRevenue *= (1 + growthRate);
+                predictedRevenue *= (decimal)(1 + growthRate);
             }
 
             // Calculate churn impact
             var churnRate = 0.02; // 2% monthly churn
-            var retainedRevenue = predictedRevenue * Math.Pow(1 - churnRate, monthsAhead);
+            var retainedRevenue = predictedRevenue * (decimal)Math.Pow(1 - churnRate, monthsAhead);
 
             return new RevenuePrediction
             {
@@ -201,7 +202,8 @@ namespace SchoolERP.API.Services
         {
             var subscriptions = await _context.UserSubscriptions
                 .Include(us => us.SubscriptionPlan)
-                .Where(us => us.TenantId == tenantId && us.Status == "active")
+                .Include(us => us.User)
+                .Where(us => us.User.TenantId == tenantId && us.Status == "active")
                 .ToListAsync();
 
             var planUsage = subscriptions
@@ -221,9 +223,9 @@ namespace SchoolERP.API.Services
             {
                 TotalUsers = totalUsers,
                 TotalRevenue = totalRevenue,
-                PlanDistribution = planUsage,
-                UnderutilizedFeatures = IdentifyUnderutilizedFeatures(planUsage),
-                Recommendations = GenerateOptimizationRecommendations(planUsage)
+                PlanDistribution = planUsage.ToDictionary(x => x.Key, x => (object)x.Value),
+                UnderutilizedFeatures = IdentifyUnderutilizedFeatures(planUsage.ToDictionary(x => x.Key, x => (dynamic)x.Value)),
+                Recommendations = GenerateOptimizationRecommendations(planUsage.ToDictionary(x => x.Key, x => (dynamic)x.Value))
             };
         }
 
@@ -235,7 +237,8 @@ namespace SchoolERP.API.Services
             // Check for unusual payment patterns
             var recentPayments = await _context.SubscriptionPayments
                 .Include(p => p.UserSubscription)
-                .Where(p => p.UserSubscription.TenantId == tenantId &&
+                    .ThenInclude(us => us.User)
+                .Where(p => p.UserSubscription.User.TenantId == tenantId &&
                            p.PaymentDate >= DateTime.UtcNow.AddDays(-30))
                 .ToListAsync();
 
@@ -381,7 +384,7 @@ namespace SchoolERP.API.Services
     {
         public int TotalUsers { get; set; }
         public decimal TotalRevenue { get; set; }
-        public Dictionary<string, dynamic> PlanDistribution { get; set; }
+        public Dictionary<string, object> PlanDistribution { get; set; }
         public string[] UnderutilizedFeatures { get; set; }
         public string[] Recommendations { get; set; }
     }

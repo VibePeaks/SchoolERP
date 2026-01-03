@@ -162,89 +162,109 @@ namespace SchoolERP.API.Controllers
 
                     try
                     {
-                        // Bulk insert students
-                        var studentTable = CreateStudentDataTable(validStudents, tenantId);
-                        var studentResults = await connection.QueryAsync<StudentResult>(
-                            "dbo.BulkInsertStudents",
-                            new { Students = studentTable.AsTableValuedParameter("dbo.StudentBulkInsertType") },
-                            transaction,
-                            commandType: CommandType.StoredProcedure
-                        );
+                        // For now, use EF Core for bulk insert (simplified approach)
+                        // TODO: Implement stored procedures for better performance
+                        foreach (var studentData in validStudents)
+                        {
+                            var student = new Student
+                            {
+                                FirstName = studentData.FirstName,
+                                LastName = studentData.LastName,
+                                StudentId = studentData.StudentId,
+                                Email = studentData.Email,
+                                Phone = studentData.Phone,
+                                DateOfBirth = studentData.DateOfBirth ?? DateTime.UtcNow.Date,
+                                Gender = studentData.Gender,
+                                Address = studentData.Address,
+                                ClassId = null, // Will be set later based on Class name
+                                RollNumber = studentData.RollNumber,
+                                AdmissionDate = DateTime.UtcNow.Date,
+                                Status = StudentStatus.Active,
+                                ParentName = studentData.ParentName,
+                                ParentPhone = studentData.ParentPhone,
+                                ParentEmail = studentData.ParentEmail,
+                                BranchId = 1, // Default branch
+                                HomeBranchId = 1,
+                                TenantId = tenantId
+                            };
 
-                        // Bulk insert parents
+                            _context.Students.Add(student);
+                        }
+
+                        await _context.SaveChangesAsync();
+
+                        // Handle parents after students are saved
                         if (validParents.Any())
                         {
-                            var parentTable = CreateParentDataTable(validParents);
-                            var parentResults = await connection.QueryAsync<ParentResult>(
-                                "dbo.BulkInsertParents",
-                                new { Parents = parentTable.AsTableValuedParameter("dbo.ParentBulkInsertType") },
-                                transaction,
-                                commandType: CommandType.StoredProcedure
-                            );
-
-                            // Create student-parent links
-                            var studentResultsList = studentResults.ToList();
-                            var parentResultsList = parentResults.ToList();
-
-                            foreach (var studentResult in studentResultsList)
+                            foreach (var parentData in validParents)
                             {
-                                if (!string.IsNullOrEmpty(studentResult.ParentEmail))
-                                {
-                                    var parentResult = parentResultsList
-                                        .FirstOrDefault(p => p.Email == studentResult.ParentEmail);
+                                var existingParent = await _context.Parents
+                                    .FirstOrDefaultAsync(p => p.Email == parentData.Email && p.TenantId == tenantId);
 
-                                    if (parentResult != null)
+                                if (existingParent == null)
+                                {
+                                    var parent = new Parent
                                     {
-                                        studentParentLinks.Add(new StudentParentLinkData
-                                        {
-                                            StudentId = studentResult.Id,
-                                            ParentId = parentResult.Id,
-                                            TenantId = tenantId
-                                        });
-                                    }
+                                        FirstName = parentData.FirstName,
+                                        LastName = parentData.LastName,
+                                        Email = parentData.Email,
+                                        Phone = parentData.Phone,
+                                        RelationshipType = "Parent",
+                                        Username = parentData.Email,
+                                        PasswordHash = BCrypt.Net.BCrypt.HashPassword("TempPass123!"),
+                                        IsActive = true,
+                                        TenantId = tenantId
+                                    };
+
+                                    _context.Parents.Add(parent);
                                 }
                             }
 
-                            // Bulk insert student-parent links
-                            if (studentParentLinks.Any())
-                            {
-                                var linkTable = CreateStudentParentLinkDataTable(studentParentLinks);
-                                await connection.ExecuteAsync(
-                                    "dbo.BulkInsertStudentParentLinks",
-                                    new { Links = linkTable.AsTableValuedParameter("dbo.StudentParentBulkInsertType") },
-                                    transaction,
-                                    commandType: CommandType.StoredProcedure
-                                );
-                            }
+                            await _context.SaveChangesAsync();
+                        }
 
-                            // Update parent passwords (replace temp hashes)
-                            if (parentResultsList.Any())
+                        // Create student-parent links
+                        foreach (var studentData in validStudents)
+                        {
+                            if (!string.IsNullOrEmpty(studentData.ParentEmail))
                             {
-                                var passwordUpdates = parentResultsList.Select(p => new ParentPasswordUpdate
+                                var student = await _context.Students
+                                    .FirstOrDefaultAsync(s => s.StudentId == studentData.StudentId && s.TenantId == tenantId);
+
+                                var parent = await _context.Parents
+                                    .FirstOrDefaultAsync(p => p.Email == studentData.ParentEmail && p.TenantId == tenantId);
+
+                                if (student != null && parent != null)
                                 {
-                                    ParentId = p.Id,
-                                    NewPasswordHash = BCrypt.Net.BCrypt.HashPassword("TempPass123!") // Proper password later
-                                }).ToList();
+                                    var existingLink = await _context.StudentParents
+                                        .FirstOrDefaultAsync(sp => sp.StudentId == student.Id && sp.ParentId == parent.Id);
 
-                                var passwordTable = CreateParentPasswordDataTable(passwordUpdates);
-                                await connection.ExecuteAsync(
-                                    "dbo.UpdateParentPasswords",
-                                    new { ParentPasswords = passwordTable.AsTableValuedParameter("dbo.ParentPasswordUpdateType") },
-                                    transaction,
-                                    commandType: CommandType.StoredProcedure
-                                );
+                                    if (existingLink == null)
+                                    {
+                                        var link = new StudentParent
+                                        {
+                                            StudentId = student.Id,
+                                            ParentId = parent.Id,
+                                            TenantId = tenantId,
+                                            IsPrimaryContact = true,
+                                            CanPickup = true,
+                                            EmergencyContact = true
+                                        };
+
+                                        _context.StudentParents.Add(link);
+                                    }
+                                }
                             }
                         }
 
-                        await transaction.CommitAsync();
+                        await _context.SaveChangesAsync();
 
-                        // Update result data
-                        result.Data = studentResults.Select(sr => new
+                        result.Data = validStudents.Select(s => (object)new
                         {
-                            sr.Id,
-                            sr.StudentId,
-                            sr.FirstName,
-                            sr.LastName
+                            s.StudentId,
+                            s.FirstName,
+                            s.LastName,
+                            s.Email
                         }).ToList();
 
                     }
@@ -336,7 +356,7 @@ namespace SchoolERP.API.Controllers
                             LastName = teacherData.LastName,
                             Email = teacherData.Email,
                             Phone = teacherData.Phone,
-                            Role = UserRole.Teacher,
+                            Role = "teacher",
                             IsActive = true,
                             TenantId = GetCurrentTenantId()
                         };
@@ -348,12 +368,14 @@ namespace SchoolERP.API.Controllers
                         // Create teacher profile
                         var teacherProfile = new Teacher
                         {
-                            UserId = teacher.Id, // Will be set after save
+                            FirstName = teacherData.FirstName,
+                            LastName = teacherData.LastName,
                             EmployeeId = teacherData.EmployeeId,
-                            Subject = teacherData.Subject,
+                            Email = teacherData.Email,
+                            Subjects = teacherData.Subject, // Store as comma-separated subjects
                             Qualification = teacherData.Qualification,
-                            ExperienceYears = teacherData.ExperienceYears,
-                            DateOfJoining = teacherData.DateOfJoining ?? DateTime.UtcNow.Date,
+                            JoinDate = teacherData.DateOfJoining ?? DateTime.UtcNow.Date,
+                            BranchId = 1, // Default branch
                             TenantId = GetCurrentTenantId()
                         };
 
@@ -679,6 +701,118 @@ namespace SchoolERP.API.Controllers
             // In a real implementation, get from claims or context
             return 1; // Default tenant
         }
+
+        // DataTable creation helpers (moved inside class)
+        private DataTable CreateStudentDataTable(List<StudentUploadData> students, int tenantId)
+        {
+            var table = new DataTable();
+            table.Columns.Add("TenantId", typeof(int));
+            table.Columns.Add("FirstName", typeof(string));
+            table.Columns.Add("LastName", typeof(string));
+            table.Columns.Add("StudentId", typeof(string));
+            table.Columns.Add("Email", typeof(string));
+            table.Columns.Add("Class", typeof(string));
+            table.Columns.Add("RollNumber", typeof(string));
+            table.Columns.Add("DateOfBirth", typeof(DateTime));
+            table.Columns.Add("Gender", typeof(string));
+            table.Columns.Add("Phone", typeof(string));
+            table.Columns.Add("Address", typeof(string));
+            table.Columns.Add("ParentName", typeof(string));
+            table.Columns.Add("ParentPhone", typeof(string));
+            table.Columns.Add("ParentEmail", typeof(string));
+            table.Columns.Add("AdmissionDate", typeof(DateTime));
+            table.Columns.Add("BranchId", typeof(int));
+
+            foreach (var student in students)
+            {
+                table.Rows.Add(
+                    tenantId,
+                    student.FirstName,
+                    student.LastName,
+                    student.StudentId,
+                    student.Email,
+                    student.Class,
+                    student.RollNumber,
+                    student.DateOfBirth ?? DateTime.UtcNow.Date,
+                    student.Gender,
+                    student.Phone,
+                    student.Address,
+                    student.ParentName,
+                    student.ParentPhone,
+                    student.ParentEmail,
+                    DateTime.UtcNow.Date,
+                    1 // Default branch ID
+                );
+            }
+
+            return table;
+        }
+
+        private DataTable CreateParentDataTable(List<ParentUploadData> parents)
+        {
+            var table = new DataTable();
+            table.Columns.Add("TenantId", typeof(int));
+            table.Columns.Add("FirstName", typeof(string));
+            table.Columns.Add("LastName", typeof(string));
+            table.Columns.Add("Email", typeof(string));
+            table.Columns.Add("Phone", typeof(string));
+            table.Columns.Add("ParentName", typeof(string));
+            table.Columns.Add("ParentPhone", typeof(string));
+
+            foreach (var parent in parents)
+            {
+                table.Rows.Add(
+                    parent.TenantId,
+                    parent.FirstName,
+                    parent.LastName,
+                    parent.Email,
+                    parent.Phone,
+                    parent.ParentName,
+                    parent.ParentPhone
+                );
+            }
+
+            return table;
+        }
+
+        private DataTable CreateStudentParentLinkDataTable(List<StudentParentLinkData> links)
+        {
+            var table = new DataTable();
+            table.Columns.Add("StudentId", typeof(int));
+            table.Columns.Add("ParentId", typeof(int));
+            table.Columns.Add("TenantId", typeof(int));
+            table.Columns.Add("IsPrimaryContact", typeof(bool));
+            table.Columns.Add("CanPickup", typeof(bool));
+            table.Columns.Add("EmergencyContact", typeof(bool));
+
+            foreach (var link in links)
+            {
+                table.Rows.Add(
+                    link.StudentId,
+                    link.ParentId,
+                    link.TenantId,
+                    true, // IsPrimaryContact
+                    true, // CanPickup
+                    true  // EmergencyContact
+                );
+            }
+
+            return table;
+        }
+
+        private DataTable CreateParentPasswordDataTable(List<ParentPasswordUpdate> updates)
+        {
+            var table = new DataTable();
+            table.Columns.Add("ParentId", typeof(int));
+            table.Columns.Add("NewPasswordHash", typeof(string));
+
+            foreach (var update in updates)
+            {
+                table.Rows.Add(update.ParentId, update.NewPasswordHash);
+            }
+
+            return table;
+        }
     }
 
     // Data models for upload processing
@@ -780,117 +914,5 @@ namespace SchoolERP.API.Controllers
     {
         public int ParentId { get; set; }
         public string NewPasswordHash { get; set; }
-    }
-
-    // DataTable creation helpers
-    private DataTable CreateStudentDataTable(List<StudentUploadData> students, int tenantId)
-    {
-        var table = new DataTable();
-        table.Columns.Add("TenantId", typeof(int));
-        table.Columns.Add("FirstName", typeof(string));
-        table.Columns.Add("LastName", typeof(string));
-        table.Columns.Add("StudentId", typeof(string));
-        table.Columns.Add("Email", typeof(string));
-        table.Columns.Add("Class", typeof(string));
-        table.Columns.Add("RollNumber", typeof(string));
-        table.Columns.Add("DateOfBirth", typeof(DateTime));
-        table.Columns.Add("Gender", typeof(string));
-        table.Columns.Add("Phone", typeof(string));
-        table.Columns.Add("Address", typeof(string));
-        table.Columns.Add("ParentName", typeof(string));
-        table.Columns.Add("ParentPhone", typeof(string));
-        table.Columns.Add("ParentEmail", typeof(string));
-        table.Columns.Add("AdmissionDate", typeof(DateTime));
-        table.Columns.Add("BranchId", typeof(int));
-
-        foreach (var student in students)
-        {
-            table.Rows.Add(
-                tenantId,
-                student.FirstName,
-                student.LastName,
-                student.StudentId,
-                student.Email,
-                student.Class,
-                student.RollNumber,
-                student.DateOfBirth ?? DateTime.UtcNow.Date,
-                student.Gender,
-                student.Phone,
-                student.Address,
-                student.ParentName,
-                student.ParentPhone,
-                student.ParentEmail,
-                DateTime.UtcNow.Date,
-                1 // Default branch ID
-            );
-        }
-
-        return table;
-    }
-
-    private DataTable CreateParentDataTable(List<ParentUploadData> parents)
-    {
-        var table = new DataTable();
-        table.Columns.Add("TenantId", typeof(int));
-        table.Columns.Add("FirstName", typeof(string));
-        table.Columns.Add("LastName", typeof(string));
-        table.Columns.Add("Email", typeof(string));
-        table.Columns.Add("Phone", typeof(string));
-        table.Columns.Add("ParentName", typeof(string));
-        table.Columns.Add("ParentPhone", typeof(string));
-
-        foreach (var parent in parents)
-        {
-            table.Rows.Add(
-                parent.TenantId,
-                parent.FirstName,
-                parent.LastName,
-                parent.Email,
-                parent.Phone,
-                parent.ParentName,
-                parent.ParentPhone
-            );
-        }
-
-        return table;
-    }
-
-    private DataTable CreateStudentParentLinkDataTable(List<StudentParentLinkData> links)
-    {
-        var table = new DataTable();
-        table.Columns.Add("StudentId", typeof(int));
-        table.Columns.Add("ParentId", typeof(int));
-        table.Columns.Add("TenantId", typeof(int));
-        table.Columns.Add("IsPrimaryContact", typeof(bool));
-        table.Columns.Add("CanPickup", typeof(bool));
-        table.Columns.Add("EmergencyContact", typeof(bool));
-
-        foreach (var link in links)
-        {
-            table.Rows.Add(
-                link.StudentId,
-                link.ParentId,
-                link.TenantId,
-                true, // IsPrimaryContact
-                true, // CanPickup
-                true  // EmergencyContact
-            );
-        }
-
-        return table;
-    }
-
-    private DataTable CreateParentPasswordDataTable(List<ParentPasswordUpdate> updates)
-    {
-        var table = new DataTable();
-        table.Columns.Add("ParentId", typeof(int));
-        table.Columns.Add("NewPasswordHash", typeof(string));
-
-        foreach (var update in updates)
-        {
-            table.Rows.Add(update.ParentId, update.NewPasswordHash);
-        }
-
-        return table;
     }
 }

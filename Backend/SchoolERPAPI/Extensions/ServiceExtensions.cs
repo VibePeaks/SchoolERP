@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using FluentValidation;
 using SchoolERP.API.Models;
+using SchoolERP.API.Validators;
 
 namespace SchoolERP.API.Extensions
 {

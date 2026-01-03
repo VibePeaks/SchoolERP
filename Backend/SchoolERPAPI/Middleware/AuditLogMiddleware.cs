@@ -27,16 +27,16 @@ namespace SchoolERP.API.Middleware
 
             var auditLog = new AuditLog
             {
-                UserId = context.User.Identity?.Name ?? "Anonymous",
+                UserId = int.TryParse(context.User.Identity?.Name, out var userId) ? userId : (int?)null,
                 Action = $"{context.Request.Method} {context.Request.Path}",
-                Entity = context.Request.Path.Value.Split('/')[2],
+                EntityType = context.Request.Path.Value.Split('/').Length > 2 ? context.Request.Path.Value.Split('/')[2] : null,
                 Timestamp = DateTime.UtcNow
             };
 
             try
             {
                 await _next(context);
-                auditLog.EntityId = context.Response.StatusCode.ToString();
+                auditLog.EntityId = context.Response.StatusCode;
             }
             finally
             {
