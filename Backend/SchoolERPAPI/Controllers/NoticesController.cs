@@ -21,7 +21,7 @@ namespace SchoolERP.API.Controllers
         public async Task<IActionResult> GetNotices()
         {
             var notices = await _context.Notices
-                .OrderByDescending(n => n.PostDate)
+                .OrderByDescending(n => n.PostedAt)
                 .ToListAsync();
             return Ok(notices);
         }
@@ -30,7 +30,7 @@ namespace SchoolERP.API.Controllers
         [HttpPost]
         public async Task<IActionResult> PostNotice([FromBody] Notice notice)
         {
-            notice.PostDate = DateTime.Now;
+            notice.PostedAt = DateTime.Now;
             _context.Notices.Add(notice);
             await _context.SaveChangesAsync();
             return Ok(notice);

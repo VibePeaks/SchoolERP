@@ -11,7 +11,7 @@ namespace SchoolERP.API.Validators
             RuleFor(x => x.LastName).NotEmpty().MaximumLength(50);
             RuleFor(x => x.Email).NotEmpty().EmailAddress();
             RuleFor(x => x.Qualification).NotEmpty();
-            RuleFor(x => x.JoiningDate).NotEmpty().LessThanOrEqualTo(DateTime.Today);
+            RuleFor(x => x.JoinDate).NotEmpty().LessThanOrEqualTo(DateTime.Today);
         }
     }
 }

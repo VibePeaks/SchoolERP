@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
-using SchoolERPAPI.Data;
+using SchoolERP.API.Data;
 using System;
 using System.Collections.Generic;
 using System.Data;

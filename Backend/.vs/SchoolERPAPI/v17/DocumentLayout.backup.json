@@ -1,12 +1,534 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Practice\\SchoolERPAPI\\",
-  "Documents": [],
+  "WorkspaceRootPath": "D:\\SchholERP\\SchoolERP\\Backend\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\bustrackingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\bustrackingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\transportcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\transportcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\teacherscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\teacherscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\teachercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\teachercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\subscriptioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\subscriptioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\studentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\studentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\studentmodecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\studentmodecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\studentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\studentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\reportscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\reportscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\parentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\parentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\parentportalcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\parentportalcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\parentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\parentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\librarycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\librarycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\noticescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\noticescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\inventorycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\inventorycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\gamificationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\gamificationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\feescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\feescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\examscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\examscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\elearningcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\elearningcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\dashboardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\dashboardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\classescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\classescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\bulkuploadcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\bulkuploadcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\extensions\\serviceextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\extensions\\serviceextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\models\\studentprogress.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\models\\studentprogress.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\validators\\teachervalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\validators\\teachervalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\services\\stripepaymentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\services\\stripepaymentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\validators\\studentvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\validators\\studentvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\schoolerpapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\schoolerpapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|d:\\schholerp\\schoolerp\\backend\\schoolerpapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{5D1B0D5C-BAD1-4573-832D-FD6C21610EA9}|SchoolERPAPI\\SchoolERPAPI.csproj|solutionrelative:schoolerpapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 6,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TeachersController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\TeachersController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\TeachersController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\TeachersController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\TeachersController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:11:58.151Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "TeacherController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\TeacherController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\TeacherController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\TeacherController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\TeacherController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:11:57.404Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "SubscriptionController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\SubscriptionController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\SubscriptionController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\SubscriptionController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\SubscriptionController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:11:56.574Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "StudentsController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\StudentsController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\StudentsController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\StudentsController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\StudentsController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:11:55.811Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "StudentModeController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\StudentModeController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\StudentModeController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\StudentModeController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\StudentModeController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:11:54.872Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "StudentController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\StudentController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\StudentController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\StudentController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\StudentController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:11:53.955Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Program.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Program.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Program.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Program.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAAAB4AAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-27T13:22:49.583Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "BusTrackingController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\BusTrackingController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\BusTrackingController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\BusTrackingController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\BusTrackingController.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAsAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:12:38.823Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "TransportController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\TransportController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\TransportController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\TransportController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\TransportController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:11:58.9Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "ReportsController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\ReportsController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\ReportsController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\ReportsController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\ReportsController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:11:52.932Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "ParentPortalController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\ParentPortalController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\ParentPortalController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\ParentPortalController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\ParentPortalController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:11:49.673Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "ParentController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\ParentController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\ParentController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\ParentController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\ParentController.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:11:43.098Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "NoticesController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\NoticesController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\NoticesController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\NoticesController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\NoticesController.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:10:36.718Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "LibraryController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\LibraryController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\LibraryController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\LibraryController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\LibraryController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:10:33.957Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "InventoryController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\InventoryController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\InventoryController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\InventoryController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\InventoryController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:10:30.414Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "ParentsController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\ParentsController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\ParentsController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\ParentsController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\ParentsController.cs",
+              "ViewState": "AgIAADkAAAAAAAAAAAAuwFAAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T06:00:39.336Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "GamificationController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\GamificationController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\GamificationController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\GamificationController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\GamificationController.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAqwBoAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:04:59.578Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "FeesController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\FeesController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\FeesController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\FeesController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\FeesController.cs",
+              "ViewState": "AgIAABEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:04:57.145Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "ExamsController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\ExamsController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\ExamsController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\ExamsController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\ExamsController.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:04:54.583Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "ELearningController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\ELearningController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\ELearningController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\ELearningController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\ELearningController.cs",
+              "ViewState": "AgIAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:04:52.112Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "DashboardController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\DashboardController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\DashboardController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\DashboardController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\DashboardController.cs",
+              "ViewState": "AgIAACYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:04:46.183Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "ClassesController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\ClassesController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\ClassesController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\ClassesController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\ClassesController.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:04:41.166Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "ServiceExtensions.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Extensions\\ServiceExtensions.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Extensions\\ServiceExtensions.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Extensions\\ServiceExtensions.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Extensions\\ServiceExtensions.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAuwCMAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T09:37:56.672Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "StudentProgress.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Models\\StudentProgress.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Models\\StudentProgress.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Models\\StudentProgress.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Models\\StudentProgress.cs",
+              "ViewState": "AgIAAGAAAAAAAAAAAAAAAGkAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T09:26:03.946Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "TeacherValidator.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Validators\\TeacherValidator.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Validators\\TeacherValidator.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Validators\\TeacherValidator.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Validators\\TeacherValidator.cs",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAqwBEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T06:42:34.412Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "AdminController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\AdminController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\AdminController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\AdminController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\AdminController.cs",
+              "ViewState": "AgIAABQBAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T06:00:15.24Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\AuthController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAABQBAAAAAAAAAAAAAAUAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T06:00:48.625Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "BulkUploadController.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\BulkUploadController.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Controllers\\BulkUploadController.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Controllers\\BulkUploadController.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Controllers\\BulkUploadController.cs",
+              "ViewState": "AgIAAFgDAAAAAAAAAAAAAK8AAABeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-28T21:27:15.8Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "StripePaymentService.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Services\\StripePaymentService.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Services\\StripePaymentService.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Services\\StripePaymentService.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Services\\StripePaymentService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFkAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T06:44:04.59Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "StudentValidator.cs",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Validators\\StudentValidator.cs",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\Validators\\StudentValidator.cs",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\Validators\\StudentValidator.cs",
+              "RelativeToolTip": "SchoolERPAPI\\Validators\\StudentValidator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T06:42:08.997Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "SchoolERPAPI.csproj",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\SchoolERPAPI.csproj",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\SchoolERPAPI.csproj",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\SchoolERPAPI.csproj",
+              "RelativeToolTip": "SchoolERPAPI\\SchoolERPAPI.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-12-29T06:42:15.628Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\appsettings.json",
+              "RelativeDocumentMoniker": "SchoolERPAPI\\appsettings.json",
+              "ToolTip": "D:\\SchholERP\\SchoolERP\\Backend\\SchoolERPAPI\\appsettings.json",
+              "RelativeToolTip": "SchoolERPAPI\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-12-27T13:17:16.596Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

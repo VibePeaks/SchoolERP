@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SchoolERPAPI.Data;
 using SchoolERPAPI.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using SchoolERP.API.Data;
+using SchoolERP.API.Models;
 
 namespace SchoolERPAPI.Controllers
 {
@@ -28,9 +29,9 @@ namespace SchoolERPAPI.Controllers
         public async Task<IActionResult> GetTeacherClasses(int teacherId)
         {
             var teacher = await _context.Teachers
-                .Include(t => t.Classes)
+                .Include(t => t.ClassesTaught)
                     .ThenInclude(c => c.AttendanceRecords)
-                .Include(t => t.Classes)
+                .Include(t => t.ClassesTaught)
                     .ThenInclude(c => c.Students)
                 .FirstOrDefaultAsync(t => t.Id == teacherId);
 
@@ -39,7 +40,7 @@ namespace SchoolERPAPI.Controllers
                 return NotFound(new { success = false, message = "Teacher not found" });
             }
 
-            var classes = teacher.Classes.Select(c => new
+            var classes = teacher.ClassesTaught.Select(c => new
             {
                 c.Id,
                 c.Name,
@@ -77,9 +78,16 @@ namespace SchoolERPAPI.Controllers
             var classEntity = await _context.Classes
                 .Include(c => c.Students)
                     .ThenInclude(s => s.AttendanceRecords.Where(ar => ar.Date.Date == DateTime.UtcNow.Date))
-                .Include(c => c.Students)
-                    .ThenInclude(s => s.Grades.OrderByDescending(g => g.CreatedAt).Take(3))
                 .FirstOrDefaultAsync(c => c.Id == classId);
+
+            // Get recent grades separately
+            var studentIds = classEntity?.Students.Select(s => s.Id).ToList() ?? new List<int>();
+            var recentGrades = await _context.Grades
+                .Where(g => studentIds.Contains(g.StudentId))
+                .Include(g => g.Subject)
+                .OrderByDescending(g => g.CreatedAt)
+                .Take(10)
+                .ToListAsync();
 
             if (classEntity == null)
             {
@@ -93,18 +101,7 @@ namespace SchoolERPAPI.Controllers
                 s.LastName,
                 s.RollNumber,
                 s.Email,
-                TodayAttendance = s.AttendanceRecords.FirstOrDefault()?.Status ?? "not_marked",
-                RecentGrades = s.Grades.Select(g => new
-                {
-                    g.Id,
-                    g.SubjectId,
-                    SubjectName = g.Subject?.Name ?? "Unknown",
-                    g.ExamType,
-                    g.MarksObtained,
-                    g.TotalMarks,
-                    g.Grade,
-                    g.ExamDate
-                }),
+                TodayAttendance = s.AttendanceRecords.FirstOrDefault() != null ? s.AttendanceRecords.FirstOrDefault().Status : "not_marked",
                 AttendancePercentage = s.AttendanceRecords.Count > 0
                     ? Math.Round((double)s.AttendanceRecords.Count(ar => ar.Status == "present") / s.AttendanceRecords.Count * 100, 1)
                     : 0
@@ -293,7 +290,6 @@ namespace SchoolERPAPI.Controllers
             {
                 attendanceRecord.Remarks = request.Remarks;
             }
-            attendanceRecord.UpdatedAt = DateTime.UtcNow;
 
             try
             {
@@ -351,7 +347,7 @@ namespace SchoolERPAPI.Controllers
                     g.ExamType,
                     g.MarksObtained,
                     g.TotalMarks,
-                    g.Grade,
+                    g.GradeLetter,
                     g.Remarks,
                     g.ExamDate,
                     Percentage = g.TotalMarks > 0 ? Math.Round((double)g.MarksObtained / g.TotalMarks * 100, 2) : 0
@@ -367,7 +363,7 @@ namespace SchoolERPAPI.Controllers
                     averagePercentage = grades.Count() > 0
                         ? Math.Round(grades.Average(g => g.Percentage), 2)
                         : 0,
-                    gradeDistribution = grades.GroupBy(g => g.Grade)
+                    gradeDistribution = grades.GroupBy(g => g.GradeLetter)
                         .Select(group => new { Grade = group.Key, Count = group.Count() })
                         .OrderBy(g => g.Grade)
                 }
@@ -418,7 +414,7 @@ namespace SchoolERPAPI.Controllers
                         ExamType = request.ExamType,
                         MarksObtained = gradeData.MarksObtained,
                         TotalMarks = gradeData.TotalMarks,
-                        Grade = CalculateGrade(gradeData.MarksObtained, gradeData.TotalMarks),
+                        GradeLetter = CalculateGrade(gradeData.MarksObtained, gradeData.TotalMarks),
                         Remarks = gradeData.Remarks,
                         ExamDate = request.ExamDate,
                         TeacherId = request.TeacherId
@@ -447,7 +443,7 @@ namespace SchoolERPAPI.Controllers
                             averagePercentage = gradeRecords.Count > 0
                                 ? Math.Round(gradeRecords.Average(g => g.TotalMarks > 0 ? (double)g.MarksObtained / g.TotalMarks * 100 : 0), 2)
                                 : 0,
-                            gradeDistribution = gradeRecords.GroupBy(g => g.Grade)
+                            gradeDistribution = gradeRecords.GroupBy(g => g.GradeLetter)
                                 .Select(group => new { Grade = group.Key, Count = group.Count() })
                         }
                     }
@@ -478,7 +474,7 @@ namespace SchoolERPAPI.Controllers
 
             grade.MarksObtained = request.MarksObtained;
             grade.TotalMarks = request.TotalMarks;
-            grade.Grade = CalculateGrade(request.MarksObtained, request.TotalMarks);
+            grade.GradeLetter = CalculateGrade(request.MarksObtained, request.TotalMarks);
             grade.Remarks = request.Remarks;
             grade.UpdatedAt = DateTime.UtcNow;
 
@@ -551,6 +547,7 @@ namespace SchoolERPAPI.Controllers
     public class GradeRecordRequest
     {
         public int StudentId { get; set; }
+        public int SubjectId { get; set; }
         public int MarksObtained { get; set; }
         public int TotalMarks { get; set; }
         public string? Remarks { get; set; }

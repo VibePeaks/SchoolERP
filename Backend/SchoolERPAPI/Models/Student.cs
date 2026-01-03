@@ -40,6 +40,14 @@ namespace SchoolERP.API.Models
         public decimal? AttendancePercentage { get; set; }
         public decimal? GPA { get; set; }
 
+        // Student Mode (parent-controlled access)
+        public bool IsStudentModeEnabled { get; set; } = false;
+        public string StudentPasskey { get; set; } // BCrypt hashed
+        public string StudentPasskeySalt { get; set; }
+        public DateTime? StudentModeLastAccess { get; set; }
+        public int StudentModeAccessCount { get; set; } = 0;
+        public DateTime? StudentModeUpdatedAt { get; set; }
+
         // Navigation properties
         [JsonIgnore]
         public ICollection<StudentParent> StudentParents { get; set; }

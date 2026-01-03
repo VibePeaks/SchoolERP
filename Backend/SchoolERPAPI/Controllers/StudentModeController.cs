@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SchoolERPAPI.Data;
 using SchoolERPAPI.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using SchoolERP.API.Data;
+using SchoolERP.API.Models;
 
 namespace SchoolERPAPI.Controllers
 {
@@ -88,8 +89,8 @@ namespace SchoolERPAPI.Controllers
                         student.FirstName,
                         student.LastName,
                         student.RollNumber,
-                        student.Class,
-                        student.Section
+                        ClassName = student.Class != null ? student.Class.Name : "Not Assigned",
+                        Section = student.Class != null ? student.Class.Section : "Not Assigned"
                     },
                     session = new
                     {
@@ -115,9 +116,15 @@ namespace SchoolERPAPI.Controllers
             }
 
             var student = await _context.Students
-                .Include(s => s.Grades.OrderByDescending(g => g.CreatedAt).Take(5))
                 .Include(s => s.AttendanceRecords)
                 .FirstOrDefaultAsync(s => s.Id == studentId);
+
+            var recentGrades = await _context.Grades
+                .Where(g => g.StudentId == studentId)
+                .Include(g => g.Subject)
+                .OrderByDescending(g => g.CreatedAt)
+                .Take(10)
+                .ToListAsync();
 
             if (student == null)
             {
@@ -125,7 +132,6 @@ namespace SchoolERPAPI.Controllers
             }
 
             // Calculate GPA (simple average for demo)
-            var recentGrades = student.Grades.Take(10).ToList();
             var gpa = recentGrades.Count > 0
                 ? Math.Round(recentGrades.Average(g => g.TotalMarks > 0 ? (double)g.MarksObtained / g.TotalMarks * 10 : 0), 2)
                 : 0;
@@ -163,8 +169,8 @@ namespace SchoolERPAPI.Controllers
                         student.FirstName,
                         student.LastName,
                         student.RollNumber,
-                        student.Class,
-                        student.Section
+                        ClassName = student.Class != null ? student.Class.Name : "Not Assigned",
+                        Section = student.Class != null ? student.Class.Section : "Not Assigned"
                     },
                     academicOverview = new
                     {
@@ -180,7 +186,7 @@ namespace SchoolERPAPI.Controllers
                         g.MarksObtained,
                         g.TotalMarks,
                         percentage = g.TotalMarks > 0 ? Math.Round((double)g.MarksObtained / g.TotalMarks * 100, 1) : 0,
-                        g.Grade,
+                        g.GradeLetter,
                         g.ExamDate
                     }),
                     upcomingAssignments = upcomingAssignments,
@@ -413,18 +419,5 @@ namespace SchoolERPAPI.Controllers
         public string DeviceInfo { get; set; }
     }
 
-    // Audit entity (would typically be in Models folder)
-    public class StudentModeAudit
-    {
-        public int Id { get; set; }
-        public int StudentId { get; set; }
-        public int ParentId { get; set; }
-        public int TenantId { get; set; }
-        public string ActionType { get; set; }
-        public bool Success { get; set; }
-        public string IpAddress { get; set; }
-        public string UserAgent { get; set; }
-        public string DeviceInfo { get; set; }
-        public DateTime CreatedAt { get; set; }
-    }
+
 }
